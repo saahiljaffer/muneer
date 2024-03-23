@@ -3,34 +3,34 @@ import type { ImageAsset, Slug } from '@sanity/types'
 import groq from 'groq'
 import { type SanityClient } from 'next-sanity'
 
-export const postsQuery = groq`*[_type == "post" && defined(slug.current)] | order(_createdAt desc)`
+export const eventsQuery = groq`*[_type == "event" && defined(slug.current)] | order(_createdAt desc)`
 
-export async function getPosts(client: SanityClient): Promise<Post[]> {
-  return await client.fetch(postsQuery)
+export async function getEvents(client: SanityClient): Promise<Event[]> {
+  return await client.fetch(eventsQuery)
 }
 
-export const postBySlugQuery = groq`*[_type == "post" && slug.current == $slug][0]`
+export const eventBySlugQuery = groq`*[_type == "event" && slug.current == $slug][0]`
 
-export async function getPost(
+export async function getEvent(
   client: SanityClient,
   slug: string,
-): Promise<Post> {
-  return await client.fetch(postBySlugQuery, {
+): Promise<Event> {
+  return await client.fetch(eventBySlugQuery, {
     slug,
   })
 }
 
 export const postSlugsQuery = groq`
-*[_type == "post" && defined(slug.current)][].slug.current
+*[_type == "event" && defined(slug.current)][].slug.current
 `
 
-export interface Post {
-  _type: 'post'
+export interface Event {
+  _type: 'event'
   _id: string
   _createdAt: string
   title?: string
   slug: Slug
-  excerpt?: string
-  mainImage?: ImageAsset
+  startDate: string
+  endDate: string
   body: PortableTextBlock[]
 }

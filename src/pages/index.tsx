@@ -1,27 +1,26 @@
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { useLiveQuery } from 'next-sanity/preview'
 
-import Card from '~/components/Card'
 import Container from '~/components/Container'
-import Welcome from '~/components/Welcome'
+import EventsList from '~/components/EventsList'
 import { readToken } from '~/lib/sanity.api'
 import { getClient } from '~/lib/sanity.client'
-import { getPosts, type Post, postsQuery } from '~/lib/sanity.queries'
+import { type Event, eventsQuery, getEvents } from '~/lib/sanity.queries'
 import type { SharedPageProps } from '~/pages/_app'
 
 export const getStaticProps: GetStaticProps<
   SharedPageProps & {
-    posts: Post[]
+    events: Event[]
   }
 > = async ({ draftMode = false }) => {
   const client = getClient(draftMode ? { token: readToken } : undefined)
-  const posts = await getPosts(client)
+  const events = await getEvents(client)
 
   return {
     props: {
       draftMode,
       token: draftMode ? readToken : '',
-      posts,
+      events,
     },
   }
 }
@@ -29,15 +28,11 @@ export const getStaticProps: GetStaticProps<
 export default function IndexPage(
   props: InferGetStaticPropsType<typeof getStaticProps>,
 ) {
-  const [posts] = useLiveQuery<Post[]>(props.posts, postsQuery)
+  const [events] = useLiveQuery<Event[]>(props.events, eventsQuery)
   return (
     <Container>
       <section>
-        {posts.length ? (
-          posts.map((post) => <Card key={post._id} post={post} />)
-        ) : (
-          <Welcome />
-        )}
+        <EventsList events={events} />
       </section>
     </Container>
   )
