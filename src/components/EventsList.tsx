@@ -5,6 +5,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from '@heroicons/react/20/solid'
+import clsx from 'clsx'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
@@ -74,10 +75,6 @@ function generateCalendarArray(year, month) {
 // Example usage for January 2022
 const days = generateCalendarArray(2024, 2)
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
 export default function Example({ events }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -117,11 +114,10 @@ export default function Example({ events }) {
               <button
                 key={day.date}
                 type="button"
-                className={classNames(
+                className={clsx(
                   'py-1.5 hover:bg-gray-100 focus:z-10',
                   day.isCurrentMonth ? 'bg-white' : 'bg-gray-50',
-                  (day.color || day.isToday) && 'font-semibold',
-                  day.color && 'text-white',
+                  (day.color || day.isToday) && 'font-semibold text-white',
                   !day.color &&
                     day.isCurrentMonth &&
                     !day.isToday &&
@@ -130,7 +126,6 @@ export default function Example({ events }) {
                     !day.isCurrentMonth &&
                     !day.isToday &&
                     'text-gray-400',
-                  day.isToday && !day.color && 'text-blue-600',
                   dayIdx === 0 && 'rounded-tl-lg',
                   dayIdx === 6 && 'rounded-tr-lg',
                   dayIdx === days.length - 7 && 'rounded-bl-lg',
@@ -139,10 +134,11 @@ export default function Example({ events }) {
               >
                 <time
                   dateTime={day.date}
-                  className={classNames(
+                  className={clsx(
                     'mx-auto flex h-7 w-7 items-center justify-center rounded-full',
-                    day.color === 'green' && 'bg-cyan-600',
-                    day.color === 'black' && 'bg-blue-grey-900',
+                    day.isToday && 'bg-blue-600',
+                    day.color === 'green' && !day.isToday && 'bg-cyan-600',
+                    day.color === 'black' && !day.isToday && 'bg-blue-grey-900',
                   )}
                 >
                   {day.date.split('-').pop().replace(/^0/, '')}
