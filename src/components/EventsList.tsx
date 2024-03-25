@@ -64,7 +64,7 @@ dayjs.extend(advancedFormat)
 
 export default function Events({ events }) {
   return (
-    <div className="md:grid md:grid-cols-2 md:divide-x md:divide-blue-grey-200 max-w-screen-xl mx-auto p-4 sm:p-12 m-8 rounded-lg">
+    <div className="md:grid md:grid-cols-2 md:divide-x md:divide-blue-grey-200 max-w-screen-xl mx-auto p-4 sm:p-12 rounded-lg">
       <div className="md:pr-14">
         <div className="flex items-center">
           <h2 className="flex-auto text-sm font-semibold text-blue-grey-900">
