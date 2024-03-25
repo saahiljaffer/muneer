@@ -21,35 +21,6 @@ export default function Example() {
                     alt="Your Company"
                   />
                 </div>
-                <div className="hidden sm:ml-6 sm:block">
-                  <div className="flex space-x-4">
-                    {/* Current: "bg-blue-900 text-white", Default: "text-blue-grey-300 hover:bg-blue-700 hover:text-white" */}
-                    <a
-                      href="#"
-                      className="rounded-md bg-blue-900 px-3 py-2 text-sm font-medium text-white"
-                    >
-                      Dashboard
-                    </a>
-                    <a
-                      href="#"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-blue-grey-300 hover:bg-blue-700 hover:text-white"
-                    >
-                      Team
-                    </a>
-                    <a
-                      href="#"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-blue-grey-300 hover:bg-blue-700 hover:text-white"
-                    >
-                      Projects
-                    </a>
-                    <a
-                      href="#"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-blue-grey-300 hover:bg-blue-700 hover:text-white"
-                    >
-                      Calendar
-                    </a>
-                  </div>
-                </div>
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex items-center">
