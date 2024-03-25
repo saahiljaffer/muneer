@@ -1,3 +1,5 @@
+import { g2d, moons, toHijri } from './dateUtils'
+
 const hijri = (o, c) => {
   // locale needed later
   const proto = c.prototype
@@ -11,28 +13,33 @@ const hijri = (o, c) => {
 
     const utils = this.$utils()
     const str = formatStr || 'YYYY-MM-DDTHH:mm:ssZ'
+    const jdn = g2d(this.$y, this.$M, this.$D)
+    console.log('jdn', jdn, 'y', this.$y, 'm', this.$M, 'd', this.$D)
+    const hijriDate = toHijri(jdn)
+    console.log('toHijri', hijriDate)
+
     const result = str.replace(
       /\[([^\]]+)]|iY{1,4}|iM{1,4}|iD{1,2}|id{1,4}/g,
       (match) => {
         switch (match) {
           case 'iYY':
-            return String(this.$y).slice(-2)
+            return String(hijriDate.hy).slice(-2)
           case 'iYYYY':
-            return utils.s(this.$y, 4, '0')
+            return utils.s(hijriDate.hy, 4, '0')
           case 'iM':
-            return this.$M + 1
+            return hijriDate.hm + 1
           case 'iMM':
-            return utils.s(this.$M + 1, 2, '0')
+            return utils.s(hijriDate.hm + 1, 2, '0')
           case 'iMMM':
             return 'iMMM'
           case 'iMMMM':
             return 'iMMMM'
           case 'iD':
-            return this.$D
+            return hijriDate.hd
           case 'iDD':
-            return utils.s(this.$D, 2, '0')
+            return utils.s(hijriDate.hd, 2, '0')
           case 'id':
-            return String(this.$W)
+            return 'id'
           case 'idd':
             return 'idd'
           case 'iddd':

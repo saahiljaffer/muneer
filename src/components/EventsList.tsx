@@ -1,4 +1,4 @@
-import { Menu } from '@headlessui/react'
+import { Menu, Transition } from '@headlessui/react'
 import {
   CalendarIcon,
   ChevronDownIcon,
@@ -10,18 +10,23 @@ import advancedFormat from 'dayjs/plugin/advancedFormat'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
-import hijri from '../utils/hijri'
+import customParseFormat from '~/utils/customParseFormat'
+import customprops from '~/utils/customProps'
+import hijri from '~/utils/hijri'
 
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(advancedFormat)
 dayjs.extend(hijri)
+dayjs.extend(customParseFormat)
+dayjs.extend(customprops)
 
 function generateCalendarArray(year, month) {
-  const startDate = dayjs(new Date(year, month, 1))
-    .locale('en-ca')
-    .startOf('week')
-  const endDate = dayjs(new Date(year, month + 1, 0)).endOf('week')
+  console.log(dayjs('09-01-1445', 'iMM-iDD-iYYYY'))
+  console.log(dayjs('10-01-1445', 'iMM-iDD-iYYYY'))
+
+  const startDate = dayjs('08-01-1445', 'iMM-iDD-iYYYY').startOf('week')
+  const endDate = dayjs('09-01-1445', 'iMM-iDD-iYYYY').endOf('week')
   const today = dayjs()
   const selectedDate = dayjs('2024-03-25') // Example selected date
   let days = []
@@ -31,12 +36,13 @@ function generateCalendarArray(year, month) {
     date.isSameOrBefore(endDate);
     date = date.add(1, 'day')
   ) {
-    let dateObject = date.format('YYYY-MM-DD')
+    let dateObject = date.format('iYYYY-iMM-iDD')
     let isCurrentMonth = false,
       isToday = false,
       isSelected = false
 
-    if (date.month() === month) {
+    // @ts-ignore
+    if (date.iMonth() === 8) {
       isCurrentMonth = true
     }
 
@@ -63,6 +69,7 @@ function generateCalendarArray(year, month) {
 
 // Example usage for January 2022
 const days = generateCalendarArray(2024, 2)
+console.log(days)
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -84,7 +91,7 @@ export default function Example({ events }) {
               <span className="sr-only">Previous month</span>
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </button>
-            <div className="flex-auto text-sm font-semibold">January</div>
+            <div className="flex-auto text-sm font-semibold">Ramadhan</div>
             <button
               type="button"
               className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
@@ -94,12 +101,12 @@ export default function Example({ events }) {
             </button>
           </div>
           <div className="mt-6 grid grid-cols-7 text-xs leading-6 text-gray-500">
+            <div>S</div>
             <div>M</div>
             <div>T</div>
             <div>W</div>
             <div>T</div>
             <div>F</div>
-            <div>S</div>
             <div>S</div>
           </div>
           <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-gray-200 text-sm shadow ring-1 ring-gray-200">
