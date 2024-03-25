@@ -13,7 +13,7 @@ module.exports = {
         'blue-600': '#1863AF',
         'blue-700': '#0F5499',
         'blue-800': '#0A4A8A',
-        'blue-900': '#00366B',
+        'blue-900': '#003061',
 
         'yellow-vivid-050': '#FFFBEA',
         'yellow-vivid-100': '#FFF3C4',
