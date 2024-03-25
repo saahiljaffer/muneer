@@ -1,4 +1,115 @@
-import { toGregorian, toHijri, g2d } from './dateUtils'
+// integer division
+export const div = (a, b) => {
+  return ~~(a / b)
+}
+
+// modulo
+export const mod = (a, b) => {
+  return a - ~~(a / b) * b
+}
+
+// moonsightings
+export const moons = [
+  59082, 59111, 59141, 59170, 59200, 59229, 59259, 59288, 59318, 59348, 59377,
+  59407, 59437, 59467, 59496, 59526, 59555, 59584, 59614, 59643, 59673, 59702,
+  59732, 59762, 59791, 59821, 59851, 59880, 59910, 59939, 59968, 59998, 60027,
+  60056, 60086, 60115, 60145, 60175, 60205, 60235, 60265, 60294, 60323, 60352,
+  60381, 60411, 60440, 60470, 60499, 60529, 60559, 60589, 60618, 60648, 60678,
+  60707, 60736, 60765, 60795, 60824,
+]
+
+// returns the index of the new moon closest to a modified julian day number
+const getNewMoonIndexByJulian = (mjdn) => {
+  for (var i = 0; i < moons.length; i = i + 1) {
+    if (moons[i] > mjdn) return i
+  }
+}
+
+// epoch
+export const START_MONTHS = 17292
+
+//  converts a date from a modified julian day number to a hijri date
+const julianToHijri = (jdn) => {
+  var i = getNewMoonIndexByJulian(jdn),
+    totalMonths = i + START_MONTHS,
+    cYears = Math.floor((totalMonths - 1) / 12),
+    hy = cYears + 1,
+    hm = totalMonths - 12 * cYears,
+    hd = jdn - moons[i - 1] + 1
+
+  return {
+    hy: hy,
+    hm: hm - 1,
+    hd: hd,
+  }
+}
+
+const leapGregorian = (year) => {
+  return year % 4 == 0 && !(year % 100 == 0 && year % 400 != 0)
+}
+var GREGORIAN_EPOCH = 1721425.5
+
+// calculates the julian day number for a gregorian calendar date
+const gregorianToJulian = (year, month, day) => {
+  return (
+    GREGORIAN_EPOCH -
+    1 +
+    365 * (year - 1) +
+    Math.floor((year - 1) / 4) +
+    -Math.floor((year - 1) / 100) +
+    Math.floor((year - 1) / 400) +
+    Math.floor(
+      (367 * month - 362) / 12 +
+        (month <= 2 ? 0 : leapGregorian(year) ? -1 : -2) +
+        day,
+    ) -
+    2400000.5
+  )
+}
+
+// returns the index of the new moon closest to a hijri date
+function getNewMoonIndexByHijri(hy, hm) {
+  var cYears = hy - 1,
+    totalMonths = cYears * 12 + 1 + (hm - 1),
+    i = totalMonths - START_MONTHS
+
+  return i
+}
+
+// converts a hijri date to a julian day number
+const hijriToJulian = (hy, hm, hd) => {
+  var i = getNewMoonIndexByHijri(hy, hm),
+    mjdn = hd + moons[i - 1] - 1,
+    jdn = mjdn + 2400000.5
+
+  return jdn
+}
+
+// converts a hijri date to a gregorian date
+const hijriToGregorian = (hy, hm, hd) => {
+  const gregorianDate = julianToGregorian(hijriToJulian(hy, hm, hd))
+  return gregorianDate
+}
+
+// converts a julian day number to a gregorian date
+function julianToGregorian(jdn) {
+  var j, i, gd, gm, gy
+  j = 4 * jdn + 139361631
+  j = j + div(div(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908
+  i = div(mod(j, 1461), 4) * 5 + 308
+  gd = div(mod(i, 153), 5) + 1
+  gm = mod(div(i, 153), 12) + 1
+  gy = div(j, 1461) - 100100 + div(8 - gm, 6)
+  return {
+    year: gy,
+    month: gm,
+    day: gd,
+  }
+}
+
+export const FORMAT_DEFAULT = 'YYYY-MM-DDTHH:mm:ssZ'
+
+let locale = {}
 
 const t = (format) =>
   format.replace(/(\[[^\]]+])|(MMMM|MM|DD|dddd)/g, (_, a, b) => a || b.slice(1))
@@ -12,6 +123,7 @@ const englishFormats = {
   LLLL: 'dddd, MMMM D, YYYY h:mm A',
 }
 
+// format function
 const u = (formatStr, formats) =>
   formatStr.replace(/(\[[^\]]+])|(LTS?|l{1,4}|L{1,4})/g, (_, a, b) => {
     const B = b && b.toUpperCase()
@@ -21,30 +133,33 @@ const u = (formatStr, formats) =>
 const formattingTokens =
   /(\[[^[]*\])|([-_:/.,()\s]+)|(A|a|YYYY|iYYYY|iYY?|YY?|MM?M?M?|iMM?M?M|Do|iDo|DD?|iDD?|hh?|HH?|mm?|ss?|S{1,3}|z|ZZ?)/g
 
+// parse function for each format
 const match2 = /\d\d/ // 00 - 99
 const match4 = /\d{4}/ // 0000 - 9999
 const match1to2 = /\d\d?/ // 0 - 99
 const matchSigned = /[+-]?\d+/ // -inf - inf
 const matchWord = /\d*[^-_:/,()\s\d]+/ // Word
 
-let locale = {}
-
+// parse two digit year
 let parseTwoDigitYear = function (input) {
   input = +input
   return input + (input > 68 ? 1900 : 2000)
 }
 
+// set property to value
 const addInput = function (property) {
   return function (input) {
     this[property] = +input
   }
 }
 
+// get part of locale
 const getLocalePart = (name) => {
   const part = locale[name]
   return part && (part.indexOf ? part : part.s.concat(part.f))
 }
 
+// parse function for each format
 const expressions = {
   iD: [match1to2, addInput('day')],
   iDD: [match2, addInput('day')],
@@ -97,21 +212,7 @@ const expressions = {
   iYYYY: [match4, addInput('year')],
 }
 
-function correctHours(time) {
-  const { afternoon } = time
-  if (afternoon !== undefined) {
-    const { hours } = time
-    if (afternoon) {
-      if (hours < 12) {
-        time.hours += 12
-      }
-    } else if (hours === 12) {
-      time.hours = 0
-    }
-    delete time.afternoon
-  }
-}
-
+// split string by formatting tokens
 function makeParser(format) {
   format = u(format, locale && locale.formats)
   const array = format.match(formattingTokens)
@@ -142,18 +243,18 @@ function makeParser(format) {
         input = input.replace(value, '')
       }
     }
-    correctHours(time)
     return time
   }
 }
 
+// parse input string + format to date object
 const parseFormattedInput = (input, format, utc) => {
   try {
     if (['x', 'X'].indexOf(format) > -1)
       return new Date((format === 'X' ? 1000 : 1) * input)
     const parser = makeParser(format)
     const result = parser(input)
-    const { year, month, day } = toGregorian(
+    const { year, month, day } = hijriToGregorian(
       result.year,
       result.month,
       result.day,
@@ -165,18 +266,80 @@ const parseFormattedInput = (input, format, utc) => {
     if (!(year && !month)) {
       M = month > 0 ? month - 1 : now.getMonth()
     }
-    return new Date(y, M, d)
+    const ret = new Date(y, M, d)
+    return ret
   } catch (e) {
     return new Date('') // Invalid Date
   }
 }
 
-const customParseFormat = (o, C, d) => {
-  d.p.customParseFormat = true
-  if (o && o.parseTwoDigitYear) {
-    ;({ parseTwoDigitYear } = o)
+const hijri = (option, dayjsClass, dayjsFactory) => {
+  // locale needed later
+  const proto = dayjsClass.prototype
+  // add property methods
+  proto.iMonth = function () {
+    const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
+    const hijri = julianToHijri(jdn)
+    return hijri.hm
   }
-  const proto = C.prototype
+  proto.iDay = function () {
+    const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
+    const hijri = julianToHijri(jdn)
+    return hijri.hd
+  }
+  proto.iYear = function () {
+    const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
+    const hijri = julianToHijri(jdn)
+    return hijri.hy
+  }
+  // add format methods
+  const oldFormat = proto.format
+  proto.format = function (formatStr) {
+    if (!this.isValid()) {
+      return oldFormat.bind(this)(formatStr)
+    }
+
+    const utils = this.$utils()
+    const str = formatStr || FORMAT_DEFAULT
+    const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
+    const hijriDate = julianToHijri(jdn)
+
+    const result = str.replace(
+      /\[([^\]]+)]|iY{1,4}|iM{1,4}|iD{1,2}|id{1,4}/g,
+      (match) => {
+        switch (match) {
+          case 'iYY':
+            return String(hijriDate.hy).slice(-2)
+          case 'iYYYY':
+            return utils.s(hijriDate.hy, 4, '0')
+          case 'iM':
+            return hijriDate.hm + 1
+          case 'iMM':
+            return utils.s(hijriDate.hm + 1, 2, '0')
+          case 'iMMM':
+            return 'iMMM'
+          case 'iMMMM':
+            return 'iMMMM'
+          case 'iD':
+            return hijriDate.hd
+          case 'iDD':
+            return utils.s(hijriDate.hd, 2, '0')
+          case 'id':
+            return 'id'
+          case 'idd':
+            return 'idd'
+          case 'iddd':
+            return 'iddd'
+          case 'idddd':
+            return 'idddd'
+          default:
+            return match
+        }
+      },
+    )
+    return oldFormat.bind(this)(result)
+  }
+
   const oldParse = proto.parse
   proto.parse = function (cfg) {
     const { date, utc, args } = cfg
@@ -223,4 +386,4 @@ const customParseFormat = (o, C, d) => {
   }
 }
 
-export default customParseFormat
+export default hijri

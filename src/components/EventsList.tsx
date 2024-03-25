@@ -9,26 +9,29 @@ import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import { useEffect } from 'react'
 
-import customParseFormat from '~/utils/customParseFormat'
-import customprops from '~/utils/customProps'
 import hijri from '~/utils/hijri'
 
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(advancedFormat)
 dayjs.extend(hijri)
-dayjs.extend(customParseFormat)
-dayjs.extend(customprops)
+
+const holidays = [
+  { date: '09-10', title: 'Wafat of Bibi Khadija (a)', color: 'black' },
+  { date: '09-15', title: 'Wiladat of Imam Hassan (a)', color: 'green' },
+  { date: '09-19', title: 'Wafat of Imam Ali (a)', color: 'black' },
+  { date: '09-21', title: 'Wafat of Imam Ali (a)', color: 'black' },
+  { date: '09-23', title: 'Laylatul Qadr', color: 'green' },
+  { date: '10-01', title: 'Eid al-Fitr', color: 'green' },
+]
 
 function generateCalendarArray(year, month) {
-  console.log(dayjs('09-01-1445', 'iMM-iDD-iYYYY'))
-  console.log(dayjs('10-01-1445', 'iMM-iDD-iYYYY'))
-
-  const startDate = dayjs('08-01-1445', 'iMM-iDD-iYYYY').startOf('week')
-  const endDate = dayjs('09-01-1445', 'iMM-iDD-iYYYY').endOf('week')
+  const startDate = dayjs('1445-09-01', 'iYYYY-iMM-iDD').startOf('week')
+  const endDate = dayjs('1445-10-01', 'iYYYY-iMM-iDD').endOf('week')
   const today = dayjs()
-  const selectedDate = dayjs('2024-03-25') // Example selected date
+  const selectedDate = dayjs('1445-09-19', 'iYYYY-iMM-iDD') // Example selected date
   let days = []
 
   for (
@@ -40,6 +43,7 @@ function generateCalendarArray(year, month) {
     let isCurrentMonth = false,
       isToday = false,
       isSelected = false
+    let color: string
 
     // @ts-ignore
     if (date.iMonth() === 8) {
@@ -52,15 +56,15 @@ function generateCalendarArray(year, month) {
     }
 
     // Check if the date is the selected date
-    if (date.isSame(selectedDate, 'day')) {
-      isSelected = true
-    }
+    color = holidays.find(
+      (holiday) => holiday.date === date.format('iMM-iDD'),
+    )?.color
 
     days.push({
       date: dateObject,
       isCurrentMonth,
       isToday,
-      isSelected,
+      color,
     })
   }
 
@@ -69,7 +73,6 @@ function generateCalendarArray(year, month) {
 
 // Example usage for January 2022
 const days = generateCalendarArray(2024, 2)
-console.log(days)
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -117,17 +120,17 @@ export default function Example({ events }) {
                 className={classNames(
                   'py-1.5 hover:bg-gray-100 focus:z-10',
                   day.isCurrentMonth ? 'bg-white' : 'bg-gray-50',
-                  (day.isSelected || day.isToday) && 'font-semibold',
-                  day.isSelected && 'text-white',
-                  !day.isSelected &&
+                  (day.color || day.isToday) && 'font-semibold',
+                  day.color && 'text-white',
+                  !day.color &&
                     day.isCurrentMonth &&
                     !day.isToday &&
                     'text-gray-900',
-                  !day.isSelected &&
+                  !day.color &&
                     !day.isCurrentMonth &&
                     !day.isToday &&
                     'text-gray-400',
-                  day.isToday && !day.isSelected && 'text-blue-600',
+                  day.isToday && !day.color && 'text-blue-600',
                   dayIdx === 0 && 'rounded-tl-lg',
                   dayIdx === 6 && 'rounded-tr-lg',
                   dayIdx === days.length - 7 && 'rounded-bl-lg',
@@ -138,8 +141,8 @@ export default function Example({ events }) {
                   dateTime={day.date}
                   className={classNames(
                     'mx-auto flex h-7 w-7 items-center justify-center rounded-full',
-                    day.isSelected && day.isToday && 'bg-blue-600',
-                    day.isSelected && !day.isToday && 'bg-gray-900',
+                    day.color === 'green' && 'bg-cyan-600',
+                    day.color === 'black' && 'bg-blue-grey-900',
                   )}
                 >
                   {day.date.split('-').pop().replace(/^0/, '')}
