@@ -62,8 +62,7 @@ const gregorianToJulian = (year, month, day) => {
       (367 * month - 362) / 12 +
         (month <= 2 ? 0 : leapGregorian(year) ? -1 : -2) +
         day,
-    ) -
-    2400000.5
+    )
   )
 }
 
@@ -87,24 +86,50 @@ const hijriToJulian = (hy, hm, hd) => {
 
 // converts a hijri date to a gregorian date
 const hijriToGregorian = (hy, hm, hd) => {
-  const gregorianDate = julianToGregorian(hijriToJulian(hy, hm, hd))
+  const julianDate = hijriToJulian(hy, hm, hd)
+  const gregorianDate = julianToGregorian(julianDate)
   return gregorianDate
 }
 
-// converts a julian day number to a gregorian date
-function julianToGregorian(jdn) {
-  var j, i, gd, gm, gy
-  j = 4 * jdn + 139361631
-  j = j + div(div(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908
-  i = div(mod(j, 1461), 4) * 5 + 308
-  gd = div(mod(i, 153), 5) + 1
-  gm = mod(div(i, 153), 12) + 1
-  gy = div(j, 1461) - 100100 + div(8 - gm, 6)
-  return {
-    year: gy,
-    month: gm,
-    day: gd,
+//  JD_TO_GREGORIAN  --  Calculate Gregorian calendar date from Julian day
+const julianToGregorian = (jd) => {
+  var wjd,
+    depoch,
+    quadricent,
+    dqc,
+    cent,
+    dcent,
+    quad,
+    dquad,
+    yindex,
+    dyindex,
+    year,
+    yearday,
+    leapadj,
+    month,
+    day
+
+  wjd = Math.floor(jd - 0.5) + 0.5
+  depoch = wjd - GREGORIAN_EPOCH
+  quadricent = Math.floor(depoch / 146097)
+  dqc = mod(depoch, 146097)
+  cent = Math.floor(dqc / 36524)
+  dcent = mod(dqc, 36524)
+  quad = Math.floor(dcent / 1461)
+  dquad = mod(dcent, 1461)
+  yindex = Math.floor(dquad / 365)
+  year = quadricent * 400 + cent * 100 + quad * 4 + yindex
+  if (!(cent == 4 || yindex == 4)) {
+    year++
   }
+
+  yearday = wjd - gregorianToJulian(year, 1, 1)
+  leapadj =
+    wjd < gregorianToJulian(year, 3, 1) ? 0 : leapGregorian(year) ? 1 : 2
+  month = Math.floor(((yearday + leapadj) * 12 + 373) / 367)
+  day = wjd - gregorianToJulian(year, month, 1) + 1
+
+  return { year, month, day }
 }
 
 export const FORMAT_DEFAULT = 'YYYY-MM-DDTHH:mm:ssZ'
@@ -131,7 +156,7 @@ const u = (formatStr, formats) =>
   })
 
 const formattingTokens =
-  /(\[[^[]*\])|([-_:/.,()\s]+)|(A|a|YYYY|iYYYY|iYY?|YY?|MM?M?M?|iMM?M?M|Do|iDo|DD?|iDD?|hh?|HH?|mm?|ss?|S{1,3}|z|ZZ?)/g
+  /(\[[^[]*\])|([-_:/.,()\s]+)|(iYYYY|iYY?|YY?|MM?M?M?|iMM?M?M?|Do|iDo|DD?|iDD?)/g
 
 // parse function for each format
 const match2 = /\d\d/ // 00 - 99
@@ -279,7 +304,8 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
   // add property methods
   proto.iMonth = function () {
     const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
-    const hijri = julianToHijri(jdn)
+    const mjdn = jdn - 2400000.5
+    const hijri = julianToHijri(mjdn)
     return hijri.hm
   }
   proto.iDay = function () {
@@ -289,7 +315,8 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
   }
   proto.iYear = function () {
     const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
-    const hijri = julianToHijri(jdn)
+    const mjdn = jdn - 2400000.5
+    const hijri = julianToHijri(mjdn)
     return hijri.hy
   }
   // add format methods
@@ -298,11 +325,29 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
     if (!this.isValid()) {
       return oldFormat.bind(this)(formatStr)
     }
+    const islamicMonths = [
+      'Muharram',
+      'Safar',
+      "Rabi' al-awwal",
+      "Rabi' al-thani",
+      'Jumada al-awwal',
+      'Jumada al-thani',
+      'Rajab',
+      'Shaban',
+      'Ramadan',
+      'Shawwal',
+      "Dhu al-Qi'dah",
+      'Dhu al-Hijjah',
+    ]
+
+    const getShort = (arr, index, full, length) =>
+      (arr && (arr[index] || arr(this, str))) || full[index].slice(0, length)
 
     const utils = this.$utils()
     const str = formatStr || FORMAT_DEFAULT
     const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
-    const hijriDate = julianToHijri(jdn)
+    const mjdn = jdn - 2400000.5
+    const hijriDate = julianToHijri(mjdn)
 
     const result = str.replace(
       /\[([^\]]+)]|iY{1,4}|iM{1,4}|iD{1,2}|id{1,4}/g,
@@ -317,9 +362,9 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
           case 'iMM':
             return utils.s(hijriDate.hm + 1, 2, '0')
           case 'iMMM':
-            return 'iMMM'
+            return 'September'
           case 'iMMMM':
-            return 'iMMMM'
+            return `[${islamicMonths[hijriDate.hm]}]`
           case 'iD':
             return hijriDate.hd
           case 'iDD':

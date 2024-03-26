@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.fc td,
-.fc th {
-  padding: initial;
+body {
+  @apply bg-slate-50;
 }
