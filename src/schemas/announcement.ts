@@ -1,8 +1,8 @@
 import { defineField, defineType } from 'sanity'
 
 export default defineType({
-  name: 'event',
-  title: 'Event',
+  name: 'announcement',
+  title: 'Announcement',
   type: 'document',
   fields: [
     defineField({
@@ -21,14 +21,9 @@ export default defineType({
       },
     }),
     defineField({
-      name: 'startDatetime',
-      title: 'Start',
-      type: 'datetime',
-    }),
-    defineField({
-      name: 'endDatetime',
-      title: 'End',
-      type: 'datetime',
+      name: 'image',
+      title: 'Image',
+      type: 'image',
     }),
   ],
   preview: {

@@ -3,10 +3,17 @@ import type { ImageAsset, Slug } from '@sanity/types'
 import groq from 'groq'
 import { type SanityClient } from 'next-sanity'
 
-export const eventsQuery = groq`*[_type == "event" && defined(slug.current)] | order(startDatetime asc)`
+export const eventsQuery = groq`*[_type == "event" && defined(slug.current)] | order(startDatetime asc) [0...4]`
+export const announcementsQuery = groq`*[_type == "announcement" && defined(slug.current)]`
 
 export async function getEvents(client: SanityClient): Promise<Event[]> {
   return await client.fetch(eventsQuery)
+}
+
+export async function getAnnouncements(
+  client: SanityClient,
+): Promise<Announcement[]> {
+  return await client.fetch(announcementsQuery)
 }
 
 export const eventBySlugQuery = groq`*[_type == "event" && slug.current == $slug][0]`
@@ -20,7 +27,7 @@ export async function getEvent(
   })
 }
 
-export const postSlugsQuery = groq`
+export const eventSlugsQuery = groq`
 *[_type == "event" && defined(slug.current)][].slug.current
 `
 
@@ -32,5 +39,13 @@ export interface Event {
   slug: Slug
   startDatetime: string
   endDatetime: string
-  body: PortableTextBlock[]
+}
+
+export interface Announcement {
+  _type: 'announcement'
+  _id: string
+  _createdAt: string
+  title?: string
+  slug: Slug
+  image: any
 }
