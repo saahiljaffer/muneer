@@ -6,18 +6,18 @@ const people = [
   },
   {
     name: 'Fajr',
-    adhan: '1:00 PM',
-    iqamah: '1:15 PM',
+    adhan: '5:15 AM',
+    iqamah: '5:15 AM',
   },
   {
     name: 'Sunrise',
-    adhan: '3:00 PM',
-    iqamah: '3:15 PM',
+    adhan: '7:00 AM',
+    iqamah: '7:15 AM',
   },
   {
     name: 'Dhuhr',
-    adhan: '5:00 PM',
-    iqamah: '5:15 PM',
+    adhan: '1:00 PM',
+    iqamah: '1:15 PM',
   },
   {
     name: 'Sunset',
@@ -26,8 +26,8 @@ const people = [
   },
   {
     name: 'Maghrib',
-    adhan: '7:00 PM',
-    iqamah: '7:15 PM',
+    adhan: '6:15 PM',
+    iqamah: '6:15 PM',
   },
   // More people...
 ]
