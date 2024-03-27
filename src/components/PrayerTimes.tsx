@@ -1,36 +1,42 @@
 const people = [
   {
-    name: 'fajr',
+    name: 'Imsak',
     adhan: '5:00 AM',
     iqamah: '5:15 AM',
   },
   {
-    name: 'dhuhr',
+    name: 'Fajr',
     adhan: '1:00 PM',
     iqamah: '1:15 PM',
   },
   {
-    name: 'asr',
+    name: 'Sunrise',
     adhan: '3:00 PM',
     iqamah: '3:15 PM',
   },
   {
-    name: 'maghrib',
+    name: 'Dhuhr',
     adhan: '5:00 PM',
     iqamah: '5:15 PM',
   },
   {
-    name: 'isha',
+    name: 'Sunset',
+    adhan: '6:00 PM',
+    iqamah: '6:15 PM',
+  },
+  {
+    name: 'Maghrib',
     adhan: '7:00 PM',
     iqamah: '7:15 PM',
   },
+  // More people...
 ]
 
 export default function Example() {
   return (
     <div className="lg:col-start-8 lg:col-end-13 lg:row-start-2 xl:col-start-9">
       <div className="flow-root">
-        <div className="overflow-x-auto ">
+        <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle ">
             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
               <table className="min-w-full divide-y divide-gray-300">
@@ -39,9 +45,7 @@ export default function Example() {
                     <th
                       scope="col"
                       className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                    >
-                      Name
-                    </th>
+                    ></th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"

@@ -90,7 +90,7 @@ export default function Calendar() {
   }
 
   return (
-    <div className="mt-10 text-center lg:col-start-8 lg:col-end-13 lg:row-start-1 xl:col-start-9">
+    <div className="text-center lg:col-start-8 lg:col-end-13 lg:row-start-1 xl:col-start-9 self-center">
       <div className="flex items-center text-slate-900">
         <button
           type="button"
@@ -173,7 +173,7 @@ export default function Calendar() {
               dayIdx === 0 && 'rounded-tl-lg',
               dayIdx === 6 && 'rounded-tr-lg',
               day.isToday && !day.color && 'bg-blue-600',
-              day.isCurrentMonth && day.color === 'green' && 'bg-blue-600',
+              day.isCurrentMonth && day.color === 'green' && 'bg-cyan-600',
               day.isCurrentMonth && day.color === 'black' && 'bg-slate-900',
               dayIdx === days.length - 7 && 'rounded-bl-lg',
               dayIdx === days.length - 1 && 'rounded-br-lg',
@@ -188,11 +188,16 @@ export default function Calendar() {
                 className={clsx(
                   'text-xs',
                   // regular text color for current month
-                  !day.color && day.isCurrentMonth && 'text-slate-600',
+                  !day.color &&
+                    day.isCurrentMonth &&
+                    !day.isToday &&
+                    'text-slate-600',
                   // text color for holidays
-                  day.color && day.isCurrentMonth && 'text-slate-200',
+                  (day.color || day.isToday) &&
+                    day.isCurrentMonth &&
+                    'text-slate-100',
                   // text color for previous or next month
-                  !day.isCurrentMonth && 'text-slate-400',
+                  !day.isCurrentMonth && !day.isToday && 'text-slate-400',
                 )}
               >
                 {day.englishDate.split('-').pop().replace(/^0/, '')}

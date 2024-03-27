@@ -1,12 +1,6 @@
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Fragment } from 'react'
+import { Disclosure } from '@headlessui/react'
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
-export default function Example() {
+export default function Header() {
   return (
     <Disclosure as="nav" className="bg-blue-900">
       {({ open }) => (
@@ -16,7 +10,7 @@ export default function Example() {
               <div className="flex-shrink-0">
                 <img
                   className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                  src="https://tailwindui.com/img/logos/mark.svg?color=white"
                   alt="Your Company"
                 />
               </div>
