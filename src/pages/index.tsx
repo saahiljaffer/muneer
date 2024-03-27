@@ -68,17 +68,17 @@ export default function IndexPage(
     <Container>
       <section>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-x-16 space-y-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-x-16 space-y-6">
             <Calendar />
             <EventsList events={events} />
-            <div className="lg:col-span-7 xl:col-span-8 space-y-8">
-              <div className="flex">
+            <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+              <div className="flex items-center">
                 <h2 className="text-base font-semibold text-start leading-6 text-slate-900">
                   News
                 </h2>
                 <a
                   href="/news"
-                  className="hover:underline ml-auto text-sm font-semibold text-blue-900 hover:text-blue-700"
+                  className="cursor-pointer hover:underline ml-auto text-sm font-semibold text-blue-900 hover:text-blue-700"
                 >
                   View all
                 </a>
@@ -95,13 +95,13 @@ export default function IndexPage(
                   </div>
                 ))}
               </div>
-              <div className="flex">
+              <div className="flex items-center">
                 <h2 className="text-base font-semibold text-start leading-6 text-slate-900">
                   From our partners
                 </h2>
                 <a
                   href="/news"
-                  className="hover:underline ml-auto text-sm font-semibold text-blue-900 hover:text-blue-700"
+                  className="cursor-pointer hover:underline ml-auto text-sm font-semibold text-blue-900 hover:text-blue-700"
                 >
                   View all
                 </a>

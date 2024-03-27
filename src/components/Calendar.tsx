@@ -62,6 +62,7 @@ function generateCalendarArray(year: number, month: number) {
       isCurrentMonth,
       isToday,
       color,
+      event: date.day() === 4 || date.day() === 5,
     })
   }
 
@@ -108,7 +109,7 @@ export default function Calendar() {
           <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
         </button>
         <button
-          className="flex-auto text-sm font-semibold group"
+          className="cursor-pointer flex-auto text-sm font-semibold group"
           onClick={() => {
             // @ts-ignore
             setYear(dayjs().iYear())
@@ -116,12 +117,12 @@ export default function Calendar() {
             setMonth(dayjs().iMonth() + 1)
           }}
         >
-          <span className="group-hover:underline group-hover:text-slate-800">
+          <p className="text-sm font-semibold leading-6 text-slate-900 group-hover:underline group-hover:text-slate-800">
             {header}
-          </span>
-          <span className="block text-xs text-slate-500 group-hover:text-slate-600 group-hover:underline">
+          </p>
+          <p className="cursor-pointer hover:underline text-[13px] font-semibold text-slate-500 group-hover:underline group-hover:text-slate-600">
             {englishHeader}
-          </span>
+          </p>
         </button>
         <button
           disabled={year === 1446 && month === 11}
@@ -181,7 +182,7 @@ export default function Calendar() {
           >
             <time
               dateTime={day.date}
-              className="w-full flex flex-col h-7 px-2 items-end justify-center rounded-full"
+              className="w-full flex flex-col h-8 px-2 items-end justify-center rounded-full"
             >
               <p>{day.date.split('-').pop().replace(/^0/, '')}</p>
               <p
@@ -202,6 +203,17 @@ export default function Calendar() {
               >
                 {day.englishDate.split('-').pop().replace(/^0/, '')}
               </p>
+              {day.isCurrentMonth && day.event && (
+                <span
+                  className={clsx(
+                    'self-start h-1 w-1 rounded-full bg-slate-900',
+                    // text color for holidays
+                    day.color && 'bg-slate-100',
+                  )}
+                >
+                  &nbsp;
+                </span>
+              )}
             </time>
           </div>
         ))}

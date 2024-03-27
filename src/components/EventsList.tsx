@@ -23,13 +23,13 @@ const holidays = [
 export default function Example({ events }) {
   return (
     <div className="lg:col-span-7 xl:col-span-8">
-      <div className="flex">
+      <div className="flex items-center">
         <h2 className="text-base font-semibold leading-6 text-slate-900">
           Upcoming Events
         </h2>
         <a
           href="/events"
-          className="hover:underline ml-auto text-sm font-semibold text-blue-900 hover:text-blue-700"
+          className="cursor-pointer hover:underline ml-auto text-sm font-semibold text-blue-900 hover:text-blue-700"
         >
           View all
         </a>
