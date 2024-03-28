@@ -55,7 +55,7 @@ export default function Example({ events }) {
                     />
                   </dt>
                   <dd>
-                    <time dateTime={event.startDatetime}>
+                    <time className="" dateTime={event.startDatetime}>
                       {dayjs(event.startDatetime).format(
                         'MMMM Do, YYYY [at] h:mm A',
                       )}

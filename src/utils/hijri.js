@@ -1,15 +1,15 @@
 // integer division
-export const div = (a, b) => {
+const div = (a, b) => {
   return ~~(a / b)
 }
 
 // modulo
-export const mod = (a, b) => {
+const mod = (a, b) => {
   return a - ~~(a / b) * b
 }
 
-// moonsightings
-export const moons = [
+// modified julian day numbers for moon sightings from 1442 to 1446
+const moonSightings = [
   59082, 59111, 59141, 59170, 59200, 59229, 59259, 59288, 59318, 59348, 59377,
   59407, 59437, 59467, 59496, 59526, 59555, 59584, 59614, 59643, 59673, 59702,
   59732, 59762, 59791, 59821, 59851, 59880, 59910, 59939, 59968, 59998, 60027,
@@ -19,23 +19,24 @@ export const moons = [
 ]
 
 // returns the index of the new moon closest to a modified julian day number
-const getNewMoonIndexByJulian = (mjdn) => {
-  for (var i = 0; i < moons.length; i = i + 1) {
-    if (moons[i] > mjdn) return i
+const getNewMoonIndexByModifiedJulian = (mjdn) => {
+  for (let i = 0; i < moonSightings.length; i = i + 1) {
+    if (moonSightings[i] > mjdn) return i
   }
 }
 
 // epoch
-export const START_MONTHS = 17292
+const START_MONTHS = 17292
 
-//  converts a date from a modified julian day number to a hijri date
+//  converts a date from a julian day number to a hijri date
 const julianToHijri = (jdn) => {
-  var i = getNewMoonIndexByJulian(jdn),
+  const mjdn = jdn - 2400000.5,
+    i = getNewMoonIndexByModifiedJulian(mjdn),
     totalMonths = i + START_MONTHS,
     cYears = Math.floor((totalMonths - 1) / 12),
     hy = cYears + 1,
     hm = totalMonths - 12 * cYears,
-    hd = jdn - moons[i - 1] + 1
+    hd = mjdn - moonSightings[i - 1] + 1
 
   return {
     hy: hy,
@@ -47,7 +48,7 @@ const julianToHijri = (jdn) => {
 const leapGregorian = (year) => {
   return year % 4 == 0 && !(year % 100 == 0 && year % 400 != 0)
 }
-var GREGORIAN_EPOCH = 1721425.5
+const GREGORIAN_EPOCH = 1721425.5
 
 // calculates the julian day number for a gregorian calendar date
 const gregorianToJulian = (year, month, day) => {
@@ -68,7 +69,7 @@ const gregorianToJulian = (year, month, day) => {
 
 // returns the index of the new moon closest to a hijri date
 function getNewMoonIndexByHijri(hy, hm) {
-  var cYears = hy - 1,
+  const cYears = hy - 1,
     totalMonths = cYears * 12 + 1 + (hm - 1),
     i = totalMonths - START_MONTHS
 
@@ -77,8 +78,8 @@ function getNewMoonIndexByHijri(hy, hm) {
 
 // converts a hijri date to a julian day number
 const hijriToJulian = (hy, hm, hd) => {
-  var i = getNewMoonIndexByHijri(hy, hm),
-    mjdn = hd + moons[i - 1] - 1,
+  const i = getNewMoonIndexByHijri(hy, hm),
+    mjdn = hd + moonSightings[i - 1] - 1,
     jdn = mjdn + 2400000.5
 
   return jdn
@@ -93,7 +94,7 @@ const hijriToGregorian = (hy, hm, hd) => {
 
 //  JD_TO_GREGORIAN  --  Calculate Gregorian calendar date from Julian day
 const julianToGregorian = (jd) => {
-  var wjd,
+  let wjd,
     depoch,
     quadricent,
     dqc,
@@ -132,7 +133,7 @@ const julianToGregorian = (jd) => {
   return { year, month, day }
 }
 
-export const FORMAT_DEFAULT = 'YYYY-MM-DDTHH:mm:ssZ'
+const FORMAT_DEFAULT = 'YYYY-MM-DDTHH:mm:ssZ'
 
 let locale = {}
 
@@ -171,7 +172,7 @@ let parseTwoDigitYear = function (input) {
   return input + (input > 68 ? 1900 : 2000)
 }
 
-// set property to value
+// set property to value for parser
 const addInput = function (property) {
   return function (input) {
     this[property] = +input
@@ -304,8 +305,7 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
   // add property methods
   proto.iMonth = function () {
     const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
-    const mjdn = jdn - 2400000.5
-    const hijri = julianToHijri(mjdn)
+    const hijri = julianToHijri(jdn)
     return hijri.hm
   }
   proto.iDay = function () {
@@ -315,8 +315,7 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
   }
   proto.iYear = function () {
     const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
-    const mjdn = jdn - 2400000.5
-    const hijri = julianToHijri(mjdn)
+    const hijri = julianToHijri(jdn)
     return hijri.hy
   }
   // add format methods
@@ -340,14 +339,10 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
       'Dhu al-Hijjah',
     ]
 
-    const getShort = (arr, index, full, length) =>
-      (arr && (arr[index] || arr(this, str))) || full[index].slice(0, length)
-
     const utils = this.$utils()
     const str = formatStr || FORMAT_DEFAULT
     const jdn = gregorianToJulian(this.$y, this.$M + 1, this.$D)
-    const mjdn = jdn - 2400000.5
-    const hijriDate = julianToHijri(mjdn)
+    const hijriDate = julianToHijri(jdn)
 
     const result = str.replace(
       /\[([^\]]+)]|iY{1,4}|iM{1,4}|iD{1,2}|id{1,4}/g,

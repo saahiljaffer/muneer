@@ -206,9 +206,10 @@ export default function Calendar() {
               {day.isCurrentMonth && day.event && (
                 <span
                   className={clsx(
-                    'self-start h-1 w-1 rounded-full bg-slate-900',
+                    'self-start h-1 w-1 rounded-full',
+                    !day.color && 'bg-blue-600',
                     // text color for holidays
-                    day.color && 'bg-slate-100',
+                    day.color && 'bg-blue-100',
                   )}
                 >
                   &nbsp;

@@ -16,8 +16,8 @@ const people = [
   },
   {
     name: 'Dhuhr',
-    adhan: '1:00 PM',
-    iqamah: '1:15 PM',
+    adhan: '12:00 PM',
+    iqamah: '12:15 PM',
   },
   {
     name: 'Sunset',
@@ -50,7 +50,7 @@ export default function PrayerTimes() {
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle ">
             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <table className="min-w-full divide-y divide-slate-300">
+              <table className="tabular-nums min-w-full divide-y divide-slate-300">
                 <thead className="bg-slate-100">
                   <tr>
                     <th
@@ -59,13 +59,13 @@ export default function PrayerTimes() {
                     ></th>
                     <th
                       scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900"
+                      className="text-end px-3 py-3.5 text-sm font-semibold text-slate-900"
                     >
                       Adhan
                     </th>
                     <th
                       scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900"
+                      className="px-3 py-3.5 text-end text-sm font-semibold text-slate-900"
                     >
                       Iqamah
                     </th>
@@ -74,13 +74,13 @@ export default function PrayerTimes() {
                 <tbody className="divide-y divide-slate-200 bg-white">
                   {people.map((person) => (
                     <tr key={person.name}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 sm:pl-6">
+                      <td className="text-end whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-slate-900 sm:pl-6">
                         {person.name}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+                      <td className="text-end whitespace-nowrap px-3 py-4 text-sm text-slate-500">
                         {person.adhan}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+                      <td className="text-end whitespace-nowrap px-3 py-4 text-sm text-slate-500">
                         {person.iqamah}
                       </td>
                     </tr>
