@@ -34,18 +34,7 @@ const people = [
 
 export default function PrayerTimes() {
   return (
-    <div className="lg:col-start-8 lg:col-end-13 lg:row-start-2 xl:col-start-9 space-y-6">
-      <div className="flex items-center">
-        <h2 className="text-base font-semibold text-start leading-6 text-slate-900">
-          Prayer Times
-        </h2>
-        <a
-          href="/prayer-times"
-          className="cursor-pointer hover:underline ml-auto text-sm font-semibold text-blue-900 hover:text-blue-700"
-        >
-          View all
-        </a>
-      </div>
+    <div className="space-y-6">
       <div className="flow-root">
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle ">
@@ -63,12 +52,6 @@ export default function PrayerTimes() {
                     >
                       Adhan
                     </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-end text-sm font-semibold text-slate-900"
-                    >
-                      Iqamah
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">
@@ -79,9 +62,6 @@ export default function PrayerTimes() {
                       </td>
                       <td className="text-end whitespace-nowrap px-3 py-4 text-sm text-slate-500">
                         {person.adhan}
-                      </td>
-                      <td className="text-end whitespace-nowrap px-3 py-4 text-sm text-slate-500">
-                        {person.iqamah}
                       </td>
                     </tr>
                   ))}
