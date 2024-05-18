@@ -1,3 +1,5 @@
+import 'dayjs/locale/ar'
+
 import { Menu, Transition } from '@headlessui/react'
 import {
   ChevronDownIcon,
@@ -10,23 +12,28 @@ import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-import { Fragment } from 'react'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import preParsePostFormat from 'dayjs/plugin/preParsePostFormat'
+import { Fragment, useEffect } from 'react'
 import { useState } from 'react'
 
 import hijri from '~/utils/hijri'
 
+dayjs.extend(localizedFormat)
+dayjs.extend(preParsePostFormat)
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isSameOrAfter)
 dayjs.extend(advancedFormat)
 dayjs.extend(hijri)
 
 const holidays = [
-  { date: '09-10', title: 'Wafat of Bibi Khadija (a)', color: 'black' },
-  { date: '09-15', title: 'Wiladat of Imam Hassan (a)', color: 'green' },
-  { date: '09-19', title: 'Wafat of Imam Ali (a)', color: 'black' },
-  { date: '09-21', title: 'Wafat of Imam Ali (a)', color: 'black' },
-  { date: '09-23', title: 'Laylatul Qadr', color: 'green' },
-  { date: '10-01', title: 'Eid al-Fitr', color: 'green' },
+  {
+    id: 1,
+    name: 'Wiladat of Imam Ali ar-Ridha',
+    date: '11-11',
+    href: '#',
+    color: 'green',
+  },
 ]
 
 const generateCalendarArray = (year: number, month: number) => {
@@ -42,8 +49,11 @@ const generateCalendarArray = (year: number, month: number) => {
     date.isSameOrBefore(endDate);
     date = date.add(1, 'day')
   ) {
-    let dateObject = date.format('iYYYY-iMM-iDD')
-    let englishDate = date.format('YYYY-MM-DD')
+    let dateObject = date.locale('ar').format('iYYYY-iMM-iD')
+    console.log('dateObject', dateObject)
+    let englishDate = date.format('YYYY-MM-D')
+    console.log('englishDate', englishDate)
+
     let isCurrentMonth = false,
       isToday = false,
       color: string
@@ -64,12 +74,14 @@ const generateCalendarArray = (year: number, month: number) => {
     )?.color
 
     days.push({
-      date: dateObject,
+      hijriDate: dateObject,
       englishDate,
       isCurrentMonth,
       isToday,
       color,
-      events: [],
+      events: holidays.filter(
+        (holiday) => holiday.date === date.format('iMM-iDD'),
+      ),
     })
   }
 
@@ -81,18 +93,28 @@ export default function Calendar() {
   const [year, setYear] = useState(dayjs().iYear())
   // @ts-ignore
   const [month, setMonth] = useState(dayjs().iMonth() + 1)
+  const [days, setDays] = useState([])
 
-  const days = generateCalendarArray(year, month)
+  const startDate = dayjs(`${year}-${month}-01`, 'iYYYY-iM-iDD').startOf('week')
+  const endDate = dayjs(`${year}-${month + 1}-01`, 'iYYYY-iM-iDD')
+    .subtract(1, 'day')
+    .endOf('week')
+  const numOfWeeks = endDate.diff(startDate, 'week') + 1
 
-  const header = dayjs(`${year}-${month}-01`, 'iYYYY-iM-iDD').format(
-    'iMMMM iYYYY',
-  )
+  useEffect(() => {
+    setDays(generateCalendarArray(year, month))
+  }, [year, month, setDays])
+
+  const hijriHeader = dayjs(`${year}-${month}-01`, 'iYYYY-iM-iDD')
+    .locale('ar')
+    .format('iMMMM iYYYY')
   const startOfMonth = dayjs(`${year}-${month}-01`, 'iYYYY-iM-iDD')
   const endOfMonth = dayjs(`${year}-${month + 1}-01`, 'iYYYY-iM-iDD').subtract(
     1,
     'day',
   )
-  let englishHeader
+
+  let englishHeader: string
 
   if (startOfMonth.isSame(endOfMonth, 'month')) {
     englishHeader = startOfMonth.format('MMMM YYYY')
@@ -104,7 +126,7 @@ export default function Calendar() {
     <div className="lg:flex lg:min-h-screen lg:h-full lg:flex-col col-span-3">
       <header className="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
         <h1 className="text-base font-semibold leading-6 text-gray-900">
-          <p>{header}</p>
+          <p>{hijriHeader}</p>
           <p>{englishHeader}</p>
         </h1>
         <div className="flex items-center">
@@ -273,7 +295,7 @@ export default function Calendar() {
           </Menu>
         </div>
       </header>
-      <div className="shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
+      <div className="mx-2 shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
         <div className="grid grid-cols-7 gap-px border-b border-gray-300 bg-gray-200 text-center text-xs font-semibold leading-6 text-gray-700 lg:flex-none">
           <div className="bg-white py-2">
             S<span className="sr-only sm:not-sr-only">un</span>
@@ -298,23 +320,32 @@ export default function Calendar() {
           </div>
         </div>
         <div className="flex bg-gray-200 text-xs leading-6 text-gray-700 lg:flex-auto">
-          <div className="hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-6 lg:gap-px">
+          <div
+            className={clsx(
+              numOfWeeks === 6 ? 'lg:grid-rows-6' : 'lg:grid-rows-5',
+              'hidden w-full lg:grid lg:grid-cols-7 lg:gap-px',
+            )}
+          >
             {days.map((day) => (
               <div
                 key={day.date}
                 className={clsx(
                   day.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-500',
+                  day.isToday && ' bg-indigo-600 text-white  font-semibold',
                   'relative px-3 py-2',
                 )}
               >
                 <time
                   dateTime={day.date}
-                  className={
-                    day.isToday ? ' text-indigo-600 font-semibold' : undefined
-                  }
+                  className={clsx(
+                    day.isToday
+                      ? ' bg-indigo-600 text-white -mx-3 px-3 -mt-2 py-2 font-semibold'
+                      : undefined,
+                    'flex justify-between',
+                  )}
                 >
-                  <p>{day.date.split('-').pop().replace(/^0/, '')}</p>
-                  <p>{day.englishDate.split('-').pop().replace(/^0/, '')}</p>
+                  <p>{day.englishDate.split('-').pop()}</p>
+                  <p>{day.hijriDate.split('-').pop()}</p>
                 </time>
                 {day.events.length > 0 && (
                   <ol className="mt-2">
@@ -374,7 +405,7 @@ export default function Calendar() {
                     'ml-auto',
                   )}
                 >
-                  <p>{day.date.split('-').pop().replace(/^0/, '')}</p>
+                  <p>{day.hijriDate.split('-').pop().replace(/^0/, '')}</p>
                   <p>{day.englishDate.split('-').pop().replace(/^0/, '')}</p>
                 </time>
                 <span className="sr-only">{day.events.length} events</span>

@@ -327,20 +327,10 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
     if (!this.isValid()) {
       return oldFormat.bind(this)(formatStr)
     }
-    const islamicMonths = [
-      'Muharram',
-      'Safar',
-      "Rabi' al-awwal",
-      "Rabi' al-thani",
-      'Jumada al-awwal',
-      'Jumada al-thani',
-      'Rajab',
-      'Shaban',
-      'Ramadan',
-      'Shawwal',
-      "Dhu al-Qi'dah",
-      'Dhu al-Hijjah',
-    ]
+    const islamicMonths =
+      'محرم_صفر_ربيع الأول_ربيع الثاني_جمادى الأولى_جمادى الآخرة_رجب_شعبان_رمضان_شوال_ذو القعدة_ذو الحجة'.split(
+        '_',
+      )
 
     const utils = this.$utils()
     const str = formatStr || FORMAT_DEFAULT
