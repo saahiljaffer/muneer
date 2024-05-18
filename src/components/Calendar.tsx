@@ -18,6 +18,8 @@ import { Fragment, useEffect } from 'react'
 import { useState } from 'react'
 
 import hijri from '~/utils/hijri'
+var customParseFormat = require('dayjs/plugin/customParseFormat')
+dayjs.extend(customParseFormat)
 
 dayjs.extend(localizedFormat)
 dayjs.extend(preParsePostFormat)
@@ -229,7 +231,7 @@ const holidays = [
     color: '11',
   },
   {
-    title: 'Wiladat of Imam Ali ar-Ridha',
+    title: 'Wiladat of Imam Ali ar-Ridha (a)',
     date: '11/11',
     color: '10',
   },
@@ -291,9 +293,7 @@ const generateCalendarArray = (year: number, month: number) => {
     date = date.add(1, 'day')
   ) {
     let dateObject = date.locale('ar').format('iYYYY-iMM-iD')
-    console.log('dateObject', dateObject)
     let englishDate = date.format('YYYY-MM-D')
-    console.log('englishDate', englishDate)
 
     let isCurrentMonth = false,
       isToday = false,
@@ -327,6 +327,54 @@ const generateCalendarArray = (year: number, month: number) => {
   }
 
   return days
+}
+
+function PrayerTimes() {
+  const [times, setTimes] = useState({
+    imsak: '0:00',
+    fajr: '0:00',
+    sunrise: '0:00',
+    dhuhr: '0:00',
+    sunset: '0:00',
+    maghrib: '0:00',
+  })
+  useEffect(() => {
+    dayjs.extend(customParseFormat)
+
+    fetch('/api/times')
+      .then((res) => res.json())
+      .then((data) => setTimes(data))
+  }, [])
+  return (
+    <div>
+      <ul className="gap-8 flex">
+        <li className="text-center">
+          <p className="font-medium">Imsak</p>
+          <p>{times.imsak}</p>
+        </li>
+        <li className="text-center">
+          <p className="font-medium">Fajr</p>
+          <p>{times.fajr}</p>
+        </li>
+        <li className="text-center">
+          <p className="font-medium">Sunrise</p>
+          <p>{times.sunrise}</p>
+        </li>
+        <li className="text-center">
+          <p className="font-medium">Dhuhr</p>
+          <p>{times.dhuhr}</p>
+        </li>
+        <li className="text-center">
+          <p className="font-medium">Sunset</p>
+          <p>{times.sunset}</p>
+        </li>
+        <li className="text-center">
+          <p className="font-medium">Maghrib</p>
+          <p>{times.maghrib}</p>
+        </li>
+      </ul>
+    </div>
+  )
 }
 
 export default function Calendar() {
@@ -365,12 +413,13 @@ export default function Calendar() {
 
   return (
     <div className="lg:flex lg:min-h-screen lg:h-full lg:flex-col col-span-3">
-      <header className="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
+      <header className="grid grid-cols-3 items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
         <h1 className="text-base font-semibold leading-6 text-gray-900">
           <p>{hijriHeader}</p>
           <p>{englishHeader}</p>
         </h1>
-        <div className="flex items-center">
+        <PrayerTimes />
+        <div className="flex items-center justify-end">
           <div className="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
             <button
               type="button"
@@ -569,7 +618,7 @@ export default function Calendar() {
           >
             {days.map((day) => (
               <div
-                key={day.date}
+                key={day.englishDate}
                 className={clsx(
                   day.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-500',
                   day.isToday && ' bg-indigo-600 text-white  font-semibold',
@@ -591,7 +640,7 @@ export default function Calendar() {
                 {day.events.length > 0 && (
                   <ol className="mt-2">
                     {day.events.slice(0, 2).map((event) => (
-                      <li key={event.id}>
+                      <li key={event.title}>
                         <a href={event.href} className="group flex">
                           <p className="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
                             {event.title}
@@ -618,7 +667,7 @@ export default function Calendar() {
           <div className="isolate grid w-full grid-cols-7 grid-rows-6 gap-px lg:hidden">
             {days.map((day) => (
               <button
-                key={day.date}
+                key={day.englishDate}
                 type="button"
                 className={clsx(
                   day.isCurrentMonth ? 'bg-white' : 'bg-gray-50',
