@@ -339,7 +339,7 @@ function PrayerTimes() {
   useEffect(() => {
     dayjs.extend(customParseFormat)
 
-    fetch('/api/times')
+    fetch('/api/timings')
       .then((res) => res.json())
       .then((data) => setTimes(data))
   }, [])
