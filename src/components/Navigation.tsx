@@ -84,7 +84,7 @@ function VisibleSectionHighlight({
   pathname,
 }: {
   group: NavGroup
-  pathname: string
+  pathname: string | null
 }) {
   let [sections, visibleSections] = useInitialValue(
     [
@@ -126,7 +126,7 @@ function ActivePageMarker({
   pathname,
 }: {
   group: NavGroup
-  pathname: string
+  pathname: string | null
 }) {
   let itemHeight = remToPx(2)
   let offset = remToPx(0.25)
