@@ -17,7 +17,7 @@ export function Layout({
   children: React.ReactNode
   allSections: Record<string, Array<Section>>
 }) {
-  let pathname = usePathname()
+  let pathname: string = usePathname() ?? ''
 
   return (
     <SectionProvider sections={allSections[pathname] ?? []}>
