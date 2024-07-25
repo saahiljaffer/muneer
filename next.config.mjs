@@ -22,6 +22,11 @@ const nextConfig = {
       destination: '/events.ics',
       permanent: true,
     },
+    {
+      source: '/ical',
+      destination: '/events.ics',
+      permanent: true,
+    },
   ],
 }
 

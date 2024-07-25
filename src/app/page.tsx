@@ -453,7 +453,7 @@ export default function Page() {
             <button
               type="button"
               className="flex h-9 w-12 items-center justify-center rounded-r-md border-y border-r border-slate-300 pl-1 text-slate-400 hover:text-slate-500 focus:relative md:w-9 md:pl-0 md:hover:bg-slate-50"
-              disabled={year === 1446 && month === 12}
+              disabled={year === 1447 && month === 12}
               onClick={() => {
                 if (month === 12) {
                   setYear(year + 1)
