@@ -16,6 +16,13 @@ const withMDX = nextMDX({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
+  redirects: async () => [
+    {
+      source: '/events',
+      destination: '/events.ics',
+      permanent: true,
+    },
+  ],
 }
 
 export default withSearch(withMDX(nextConfig))
