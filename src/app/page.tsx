@@ -3,6 +3,7 @@ import 'dayjs/locale/ar'
 
 import { useEffect, useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { CalendarDaysIcon } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
@@ -483,15 +484,15 @@ export default function Page() {
   let englishHeader: string
 
   if (startOfMonth.isSame(endOfMonth, 'month')) {
-    englishHeader = startOfMonth.format('MMMM YYYY')
+    englishHeader = startOfMonth.format('MMM YYYY')
   } else {
-    englishHeader = `${startOfMonth.format('MMMM YYYY')} - ${endOfMonth.format(
-      'MMMM YYYY',
+    englishHeader = `${startOfMonth.format('MMM YYYY')} - ${endOfMonth.format(
+      'MMM YYYY',
     )}`
   }
   return (
     <div className="col-span-3 flex h-full min-h-screen w-full flex-col tabular-nums">
-      <header className="grid grid-cols-2 items-center justify-between border-b border-slate-200 px-6 py-4 md:grid-cols-3 lg:flex-none">
+      <header className="flex items-center justify-between border-b border-slate-200 px-2.5 py-4 md:grid md:grid-cols-3 lg:flex-none">
         <h1 className="text-base font-semibold normal-nums leading-6 text-slate-900">
           <p>{hijriHeader}</p>
           <p>{englishHeader}</p>
@@ -501,7 +502,7 @@ export default function Page() {
           <div className="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
             <button
               type="button"
-              className="flex h-9 w-12 items-center justify-center rounded-l-md border-y border-l border-slate-300 pr-1 text-slate-400 hover:text-slate-500 focus:relative md:w-9 md:pr-0 md:hover:bg-slate-50"
+              className="flex h-9 w-9 items-center justify-center rounded-l-md border-y border-l border-slate-300 pr-1 text-slate-400 hover:text-slate-500 focus:relative md:w-9 md:pr-0 md:hover:bg-slate-50"
               disabled={year === 1440 && month === 1}
               onClick={() => {
                 if (month === 1) {
@@ -512,23 +513,21 @@ export default function Page() {
                 }
               }}
             >
-              <span className="sr-only">Previous month</span>
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </button>
             <button
               type="button"
-              className="hidden border-y border-slate-300 px-3.5 text-sm font-semibold text-slate-900 hover:bg-slate-50 focus:relative md:block"
+              className="flex h-9 w-9 items-center justify-center border-y border-slate-300 text-slate-400 hover:text-slate-500 focus:relative md:w-9 md:hover:bg-slate-50"
               onClick={() => {
                 setYear(dayjs().iYear())
                 setMonth(dayjs().iMonth() + 1)
               }}
             >
-              Today
+              <CalendarDaysIcon className="h-5 w-5 stroke-slate-900 transition-colors duration-300 group-hover/button:stroke-slate-500" />
             </button>
-            <span className="relative -mx-px h-5 w-px bg-slate-300 md:hidden" />
             <button
               type="button"
-              className="flex h-9 w-12 items-center justify-center rounded-r-md border-y border-r border-slate-300 pl-1 text-slate-400 hover:text-slate-500 focus:relative md:w-9 md:pl-0 md:hover:bg-slate-50"
+              className="flex h-9 w-9 items-center justify-center rounded-r-md border-y border-r border-slate-300 pl-1 text-slate-400 hover:text-slate-500 focus:relative md:w-9 md:pl-0 md:hover:bg-slate-50"
               disabled={year === 1447 && month === 12}
               onClick={() => {
                 if (month === 12) {
