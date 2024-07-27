@@ -353,8 +353,8 @@ function PrayerTimes() {
   }, [])
 
   return (
-    <div className="hidden md:block">
-      <ul className="flex gap-8">
+    <div className="hidden sm:block">
+      <ul className="flex gap-4 md:gap-8">
         <li className="text-center">
           <p className="font-medium">إمساك</p>
           <p>{times.imsak}</p>
