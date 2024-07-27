@@ -439,9 +439,8 @@ function MonthView({
                   ? 'bg-white'
                   : 'bg-slate-50 text-slate-500',
                 day.color === '10' && 'bg-teal-600 font-semibold text-white',
-                'relative px-3 py-2',
                 day.color === '11' && 'bg-slate-600 font-semibold text-white',
-                'relative flex cursor-pointer flex-col justify-start px-3 py-2 text-start',
+                'relative flex w-full cursor-pointer flex-col justify-start text-start',
               )}
               disabled={day.events.length === 0}
               onClick={() => setSelectedDay(day)}
@@ -449,16 +448,15 @@ function MonthView({
               <time
                 dateTime={day.date}
                 className={clsx(
-                  day.isToday &&
-                    '-mx-3 -mt-2 bg-indigo-600 px-3 py-2 font-semibold text-white',
-                  'block text-end sm:flex sm:justify-between',
+                  day.isToday && 'bg-indigo-600 font-semibold text-white',
+                  'w-full px-3 py-2 text-end sm:flex sm:justify-between',
                 )}
               >
                 <p>{day.hijriDate.split('-').pop()}</p>
                 <p>{day.englishDate.split('-').pop()}</p>
               </time>
               {day.events.length > 0 && (
-                <ol className="mt-2 hidden sm:block">
+                <ol className="hidden px-3 sm:block">
                   {day.events.slice(0, 2).map((event: any) => (
                     <li key={event.title}>
                       <a href={event.href} className="group flex">
