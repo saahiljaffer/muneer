@@ -440,7 +440,7 @@ function MonthView({
                   : 'bg-slate-50 text-slate-500',
                 day.color === '10' && 'bg-teal-600 font-semibold text-white',
                 day.color === '11' && 'bg-slate-600 font-semibold text-white',
-                'relative flex w-full cursor-pointer flex-col justify-start text-start',
+                'relative flex w-full cursor-pointer flex-col justify-start text-start disabled:cursor-default',
               )}
               disabled={day.events.length === 0}
               onClick={() => setSelectedDay(day)}
