@@ -1,13 +1,8 @@
 'use client'
 import 'dayjs/locale/ar'
 
-import { Menu, Transition } from '@headlessui/react'
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  EllipsisHorizontalIcon,
-} from '@heroicons/react/20/solid'
+import { useEffect, useState } from 'react'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
@@ -15,13 +10,10 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 import preParsePostFormat from 'dayjs/plugin/preParsePostFormat'
-import { Fragment, useEffect } from 'react'
-import { useState } from 'react'
-
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import hijri from '@/lib/hijri'
-var customParseFormat = require('dayjs/plugin/customParseFormat')
-dayjs.extend(customParseFormat)
 
+dayjs.extend(customParseFormat)
 dayjs.extend(localizedFormat)
 dayjs.extend(preParsePostFormat)
 dayjs.extend(isSameOrBefore)
@@ -236,7 +228,6 @@ const holidays = [
   },
   {
     title: 'Shahadat of Imam Muhammad at-Taqi (a)',
-    date: '11/30',
     fallbackDate: '11/29',
     color: '11',
   },
@@ -278,11 +269,7 @@ const holidays = [
   },
 ]
 
-const generateCalendarArray = (year: number, month: number) => {
-  const startDate = dayjs(`${year}-${month}-01`, 'iYYYY-iM-iDD').startOf('week')
-  const endDate = dayjs(`${year}-${month + 1}-01`, 'iYYYY-iM-iDD')
-    .subtract(1, 'day')
-    .endOf('week')
+const generateCalendarArray = (startDate: any, endDate: any, month: number) => {
   const today = dayjs()
   let days = []
 
@@ -298,17 +285,14 @@ const generateCalendarArray = (year: number, month: number) => {
       isToday = false,
       color: string | undefined
 
-    // @ts-ignore
     if (date.iMonth() === month - 1) {
       isCurrentMonth = true
     }
 
-    // Check if the date is today
     if (date.isSame(today, 'day')) {
       isToday = true
     }
 
-    // Check if the date is the selected date
     color = holidays.find((holiday) => holiday.date === date.format('iM/iD'))
       ?.color
 
@@ -345,7 +329,7 @@ function PrayerTimes() {
   }, [])
 
   return (
-    <div>
+    <div className="hidden md:block">
       <ul className="flex gap-8">
         <li className="text-center">
           <p className="font-medium">إمساك</p>
@@ -376,22 +360,172 @@ function PrayerTimes() {
   )
 }
 
-export default function Page() {
-  // @ts-ignore
-  const [year, setYear] = useState(dayjs().iYear())
-  // @ts-ignore
-  const [month, setMonth] = useState(dayjs().iMonth() + 1)
+function MobileView({ days }: { days: any[] }) {
+  return (
+    <div
+      className={clsx(
+        days.length === 42 ? 'lg:grid-rows-6' : 'lg:grid-rows-5',
+        'isolate grid w-full grid-cols-7 gap-px lg:hidden',
+      )}
+    >
+      {days.map((day: any) => (
+        <button
+          key={day.englishDate}
+          type="button"
+          className={clsx(
+            day.isCurrentMonth ? 'bg-white' : 'bg-slate-50',
+            (day.isSelected || day.isToday) && 'font-semibold',
+            day.isSelected && 'text-white',
+            !day.isSelected && day.isToday && 'text-indigo-600',
+            !day.isSelected &&
+              day.isCurrentMonth &&
+              !day.isToday &&
+              'text-slate-900',
+            !day.isSelected &&
+              !day.isCurrentMonth &&
+              !day.isToday &&
+              'text-slate-500',
+            'flex h-14 flex-col px-3 py-2 hover:bg-slate-100 focus:z-10',
+          )}
+        >
+          <time
+            dateTime={day.date}
+            className={clsx(
+              day.isSelected &&
+                'flex h-6 w-6 items-center justify-center rounded-full',
+              day.isSelected && day.isToday && 'bg-indigo-600',
+              day.isSelected && !day.isToday && 'bg-slate-900',
+              'ml-auto',
+            )}
+          >
+            <p>{day.hijriDate.split('-').pop().replace(/^0/, '')}</p>
+            <p>{day.englishDate.split('-').pop().replace(/^0/, '')}</p>
+          </time>
+          <span className="sr-only">{day.events.length} events</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function DesktopView({ days }: { days: any[] }) {
+  return (
+    <div
+      className={clsx(
+        days.length === 42 ? 'lg:grid-rows-6' : 'lg:grid-rows-5',
+        'hidden w-full lg:grid lg:grid-cols-7 lg:gap-px',
+      )}
+    >
+      {days.map((day: any) => (
+        <div
+          key={day.englishDate}
+          className={clsx(
+            day.isCurrentMonth && day.color !== '10' && day.color !== '11'
+              ? 'bg-white'
+              : 'bg-slate-50 text-slate-500',
+            day.color === '10' && 'bg-teal-600 font-semibold text-white',
+            'relative px-3 py-2',
+            day.color === '11' && 'bg-slate-600 font-semibold text-white',
+            'relative px-3 py-2',
+          )}
+        >
+          <time
+            dateTime={day.date}
+            className={clsx(
+              day.isToday
+                ? '-mx-3 -mt-2 bg-indigo-600 px-3 py-2 font-semibold text-white'
+                : undefined,
+              'flex justify-between',
+            )}
+          >
+            <p>{day.englishDate.split('-').pop()}</p>
+            <p>{day.hijriDate.split('-').pop()}</p>
+          </time>
+          {day.events.length > 0 && (
+            <ol className="mt-2">
+              {day.events.slice(0, 2).map((event: any) => (
+                <li key={event.title}>
+                  <a href={event.href} className="group flex">
+                    <p className="flex-auto font-medium leading-4">
+                      {event.title}
+                    </p>
+                    <time
+                      dateTime={event.datetime}
+                      className="ml-3 hidden flex-none xl:block"
+                    >
+                      {event.time}
+                    </time>
+                  </a>
+                </li>
+              ))}
+              {day.events.length > 2 && (
+                <li className="text-slate-500">
+                  + {day.events.length - 2} more
+                </li>
+              )}
+            </ol>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function MonthView({
+  startDate,
+  endDate,
+  month,
+}: {
+  startDate: any
+  endDate: any
+  month: number
+}) {
   const [days, setDays] = useState<any[]>([])
+  useEffect(() => {
+    setDays(generateCalendarArray(startDate, endDate, month))
+  }, [startDate, endDate, setDays, month])
+
+  return (
+    <div className="mx-2 shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
+      <div className="grid grid-cols-7 gap-px border-b border-slate-300 bg-slate-200 text-center text-xs font-semibold leading-6 text-slate-700 lg:flex-none">
+        <div className="bg-white py-2">
+          S<span className="sr-only sm:not-sr-only">un</span>
+        </div>
+        <div className="bg-white py-2">
+          M<span className="sr-only sm:not-sr-only">on</span>
+        </div>
+        <div className="bg-white py-2">
+          T<span className="sr-only sm:not-sr-only">ue</span>
+        </div>
+        <div className="bg-white py-2">
+          W<span className="sr-only sm:not-sr-only">ed</span>
+        </div>
+        <div className="bg-white py-2">
+          T<span className="sr-only sm:not-sr-only">hu</span>
+        </div>
+        <div className="bg-white py-2">
+          F<span className="sr-only sm:not-sr-only">ri</span>
+        </div>
+        <div className="bg-white py-2">
+          S<span className="sr-only sm:not-sr-only">at</span>
+        </div>
+      </div>
+      <div className="flex bg-slate-200 text-xs leading-6 text-slate-700 lg:flex-auto">
+        <DesktopView days={days} />
+        <MobileView days={days} />
+      </div>
+    </div>
+  )
+}
+
+export default function Page() {
+  const [year, setYear] = useState(dayjs().iYear())
+  const [month, setMonth] = useState(dayjs().iMonth() + 1)
 
   const startDate = dayjs(`${year}-${month}-01`, 'iYYYY-iM-iDD').startOf('week')
   const endDate = dayjs(`${year}-${month + 1}-01`, 'iYYYY-iM-iDD')
     .subtract(1, 'day')
     .endOf('week')
-  const numOfWeeks = endDate.diff(startDate, 'week') + 1
-
-  useEffect(() => {
-    setDays(generateCalendarArray(year, month))
-  }, [year, month, setDays])
 
   const hijriHeader = dayjs(`${year}-${month}-01`, 'iYYYY-iM-iDD')
     .locale('ar')
@@ -412,8 +546,8 @@ export default function Page() {
     )}`
   }
   return (
-    <div className="col-span-3 tabular-nums lg:flex lg:h-full lg:min-h-screen lg:flex-col">
-      <header className="grid grid-cols-3 items-center justify-between border-b border-slate-200 px-6 py-4 lg:flex-none">
+    <div className="col-span-3 w-full tabular-nums lg:flex lg:h-full lg:min-h-screen lg:flex-col">
+      <header className="grid grid-cols-2 items-center justify-between border-b border-slate-200 px-6 py-4 md:grid-cols-3 lg:flex-none">
         <h1 className="text-base font-semibold normal-nums leading-6 text-slate-900">
           <p>{hijriHeader}</p>
           <p>{englishHeader}</p>
@@ -441,9 +575,7 @@ export default function Page() {
               type="button"
               className="hidden border-y border-slate-300 px-3.5 text-sm font-semibold text-slate-900 hover:bg-slate-50 focus:relative md:block"
               onClick={() => {
-                // @ts-ignore
                 setYear(dayjs().iYear())
-                // @ts-ignore
                 setMonth(dayjs().iMonth() + 1)
               }}
             >
@@ -467,247 +599,9 @@ export default function Page() {
               <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
-
-          <Menu as="div" className="relative ml-6 md:hidden">
-            <Menu.Button className="-mx-2 flex items-center rounded-full border border-transparent p-2 text-slate-400 hover:text-slate-500">
-              <span className="sr-only">Open menu</span>
-              <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
-            </Menu.Button>
-
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              <Menu.Items className="absolute right-0 z-10 mt-3 w-36 origin-top-right divide-y divide-slate-100 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div className="py-1">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={clsx(
-                          active
-                            ? 'bg-slate-100 text-slate-900'
-                            : 'text-slate-700',
-                          'block px-4 py-2 text-sm',
-                        )}
-                      >
-                        Create event
-                      </a>
-                    )}
-                  </Menu.Item>
-                </div>
-                <div className="py-1">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={clsx(
-                          active
-                            ? 'bg-slate-100 text-slate-900'
-                            : 'text-slate-700',
-                          'block px-4 py-2 text-sm',
-                        )}
-                      >
-                        Go to today
-                      </a>
-                    )}
-                  </Menu.Item>
-                </div>
-                <div className="py-1">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={clsx(
-                          active
-                            ? 'bg-slate-100 text-slate-900'
-                            : 'text-slate-700',
-                          'block px-4 py-2 text-sm',
-                        )}
-                      >
-                        Day view
-                      </a>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={clsx(
-                          active
-                            ? 'bg-slate-100 text-slate-900'
-                            : 'text-slate-700',
-                          'block px-4 py-2 text-sm',
-                        )}
-                      >
-                        Week view
-                      </a>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={clsx(
-                          active
-                            ? 'bg-slate-100 text-slate-900'
-                            : 'text-slate-700',
-                          'block px-4 py-2 text-sm',
-                        )}
-                      >
-                        Month view
-                      </a>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={clsx(
-                          active
-                            ? 'bg-slate-100 text-slate-900'
-                            : 'text-slate-700',
-                          'block px-4 py-2 text-sm',
-                        )}
-                      >
-                        Year view
-                      </a>
-                    )}
-                  </Menu.Item>
-                </div>
-              </Menu.Items>
-            </Transition>
-          </Menu>
         </div>
       </header>
-      <div className="mx-2 shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
-        <div className="grid grid-cols-7 gap-px border-b border-slate-300 bg-slate-200 text-center text-xs font-semibold leading-6 text-slate-700 lg:flex-none">
-          <div className="bg-white py-2">
-            S<span className="sr-only sm:not-sr-only">un</span>
-          </div>
-          <div className="bg-white py-2">
-            M<span className="sr-only sm:not-sr-only">on</span>
-          </div>
-          <div className="bg-white py-2">
-            T<span className="sr-only sm:not-sr-only">ue</span>
-          </div>
-          <div className="bg-white py-2">
-            W<span className="sr-only sm:not-sr-only">ed</span>
-          </div>
-          <div className="bg-white py-2">
-            T<span className="sr-only sm:not-sr-only">hu</span>
-          </div>
-          <div className="bg-white py-2">
-            F<span className="sr-only sm:not-sr-only">ri</span>
-          </div>
-          <div className="bg-white py-2">
-            S<span className="sr-only sm:not-sr-only">at</span>
-          </div>
-        </div>
-        <div className="flex bg-slate-200 text-xs leading-6 text-slate-700 lg:flex-auto">
-          <div
-            className={clsx(
-              numOfWeeks === 6 ? 'lg:grid-rows-6' : 'lg:grid-rows-5',
-              'hidden w-full lg:grid lg:grid-cols-7 lg:gap-px',
-            )}
-          >
-            {days.map((day: any) => (
-              <div
-                key={day.englishDate}
-                className={clsx(
-                  day.isCurrentMonth && day.color !== '10' && day.color !== '11'
-                    ? 'bg-white'
-                    : 'bg-slate-50 text-slate-500',
-                  day.color === '10' && 'bg-teal-600 font-semibold text-white',
-                  'relative px-3 py-2',
-                  day.color === '11' && 'bg-slate-600 font-semibold text-white',
-                  'relative px-3 py-2',
-                )}
-              >
-                <time
-                  dateTime={day.date}
-                  className={clsx(
-                    day.isToday
-                      ? '-mx-3 -mt-2 bg-indigo-600 px-3 py-2 font-semibold text-white'
-                      : undefined,
-                    'flex justify-between',
-                  )}
-                >
-                  <p>{day.englishDate.split('-').pop()}</p>
-                  <p>{day.hijriDate.split('-').pop()}</p>
-                </time>
-                {day.events.length > 0 && (
-                  <ol className="mt-2">
-                    {day.events.slice(0, 2).map((event: any) => (
-                      <li key={event.title}>
-                        <a href={event.href} className="group flex">
-                          <p className="flex-auto font-medium leading-4">
-                            {event.title}
-                          </p>
-                          <time
-                            dateTime={event.datetime}
-                            className="ml-3 hidden flex-none xl:block"
-                          >
-                            {event.time}
-                          </time>
-                        </a>
-                      </li>
-                    ))}
-                    {day.events.length > 2 && (
-                      <li className="text-slate-500">
-                        + {day.events.length - 2} more
-                      </li>
-                    )}
-                  </ol>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="isolate grid w-full grid-cols-7 grid-rows-6 gap-px lg:hidden">
-            {days.map((day: any) => (
-              <button
-                key={day.englishDate}
-                type="button"
-                className={clsx(
-                  day.isCurrentMonth ? 'bg-white' : 'bg-slate-50',
-                  (day.isSelected || day.isToday) && 'font-semibold',
-                  day.isSelected && 'text-white',
-                  !day.isSelected && day.isToday && 'text-indigo-600',
-                  !day.isSelected &&
-                    day.isCurrentMonth &&
-                    !day.isToday &&
-                    'text-slate-900',
-                  !day.isSelected &&
-                    !day.isCurrentMonth &&
-                    !day.isToday &&
-                    'text-slate-500',
-                  'flex h-14 flex-col px-3 py-2 hover:bg-slate-100 focus:z-10',
-                )}
-              >
-                <time
-                  dateTime={day.date}
-                  className={clsx(
-                    day.isSelected &&
-                      'flex h-6 w-6 items-center justify-center rounded-full',
-                    day.isSelected && day.isToday && 'bg-indigo-600',
-                    day.isSelected && !day.isToday && 'bg-slate-900',
-                    'ml-auto',
-                  )}
-                >
-                  <p>{day.hijriDate.split('-').pop().replace(/^0/, '')}</p>
-                  <p>{day.englishDate.split('-').pop().replace(/^0/, '')}</p>
-                </time>
-                <span className="sr-only">{day.events.length} events</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <MonthView startDate={startDate} endDate={endDate} month={month} />
     </div>
   )
 }
