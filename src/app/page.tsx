@@ -449,7 +449,7 @@ function MonthView({
                 dateTime={day.date}
                 className={clsx(
                   day.isToday && 'bg-indigo-600 font-semibold text-white',
-                  'w-full px-3 py-2 text-end sm:flex sm:justify-between',
+                  'w-full p-2 text-end leading-5 sm:flex sm:justify-between sm:px-3',
                 )}
               >
                 <p>{day.hijriDate.split('-').pop()}</p>
