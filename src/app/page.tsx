@@ -3,7 +3,7 @@ import 'dayjs/locale/ar'
 
 import { useEffect, useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import { CalendarDaysIcon } from '@heroicons/react/24/outline'
+import { CalendarDaysIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
@@ -13,6 +13,12 @@ import localizedFormat from 'dayjs/plugin/localizedFormat'
 import preParsePostFormat from 'dayjs/plugin/preParsePostFormat'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import hijri from '@/lib/hijri'
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from '@headlessui/react'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(localizedFormat)
@@ -22,7 +28,24 @@ dayjs.extend(isSameOrAfter)
 dayjs.extend(advancedFormat)
 dayjs.extend(hijri)
 
-const holidays = [
+type Holiday = {
+  title: string
+  date: string
+  fallbackDate?: string
+  color: string
+  busyStatus?: string
+}
+
+type Day = {
+  hijriDate: string
+  englishDate: string
+  isCurrentMonth: boolean
+  isToday: boolean
+  color: string | undefined
+  events: Array<Holiday>
+}
+
+const holidays: Array<Holiday> = [
   {
     title: 'Ashura',
     date: '1/10',
@@ -229,7 +252,7 @@ const holidays = [
   },
   {
     title: 'Shahadat of Imam Muhammad at-Taqi (a)',
-    fallbackDate: '11/29',
+    date: '11/29',
     color: '11',
   },
   {
@@ -272,7 +295,7 @@ const holidays = [
 
 const generateCalendarArray = (startDate: any, endDate: any, month: number) => {
   const today = dayjs()
-  let days = []
+  let days: Array<Day> = []
 
   for (
     let date = startDate;
@@ -370,10 +393,11 @@ function MonthView({
   endDate: any
   month: number
 }) {
-  const [days, setDays] = useState<any[]>([])
+  const [days, setDays] = useState<Day[]>([])
   useEffect(() => {
     setDays(generateCalendarArray(startDate, endDate, month))
   }, [startDate, endDate, setDays, month])
+  const [selectedDay, setSelectedDay] = useState<Day | undefined>()
 
   return (
     <div className="mx-2 flex flex-auto flex-col shadow ring-1 ring-black ring-opacity-5">
@@ -408,7 +432,7 @@ function MonthView({
           )}
         >
           {days.map((day: any) => (
-            <div
+            <button
               key={day.englishDate}
               className={clsx(
                 day.isCurrentMonth && day.color !== '10' && day.color !== '11'
@@ -417,8 +441,10 @@ function MonthView({
                 day.color === '10' && 'bg-teal-600 font-semibold text-white',
                 'relative px-3 py-2',
                 day.color === '11' && 'bg-slate-600 font-semibold text-white',
-                'relative px-3 py-2',
+                'relative flex cursor-pointer flex-col justify-start px-3 py-2 text-start',
               )}
+              disabled={day.events.length === 0}
+              onClick={() => setSelectedDay(day)}
             >
               <time
                 dateTime={day.date}
@@ -455,11 +481,72 @@ function MonthView({
                   )}
                 </ol>
               )}
-            </div>
+            </button>
           ))}
         </div>
       </div>
+      <Modal selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
     </div>
+  )
+}
+
+function Modal({
+  selectedDay,
+  setSelectedDay,
+}: {
+  selectedDay: Day | undefined
+  setSelectedDay: (selectedDay: Day | undefined) => void
+}) {
+  return (
+    <Dialog
+      open={Boolean(selectedDay)}
+      onClose={() => setSelectedDay(undefined)}
+      className="relative z-10"
+    >
+      <DialogBackdrop
+        transition
+        className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+      />
+
+      <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <DialogPanel
+            transition
+            className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg sm:p-6 data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+          >
+            <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+              <button
+                type="button"
+                onClick={() => setSelectedDay(undefined)}
+                className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                <span className="sr-only">Close</span>
+                <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="sm:flex sm:items-start">
+              <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                <DialogTitle
+                  as="h3"
+                  className="text-base font-semibold leading-6 text-gray-900"
+                >
+                  {dayjs(selectedDay?.englishDate)
+                    .locale('ar')
+                    .format('iD iMMMM iYYYY')}
+                </DialogTitle>
+                <div className="mt-2">
+                  {selectedDay?.events.map((event) => (
+                    <p key={event.title}>
+                      <span className="font-semibold">{event.title}</span>
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </DialogPanel>
+        </div>
+      </div>
+    </Dialog>
   )
 }
 
