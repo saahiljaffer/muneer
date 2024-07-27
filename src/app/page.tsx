@@ -398,6 +398,7 @@ function MonthView({
     setDays(generateCalendarArray(startDate, endDate, month))
   }, [startDate, endDate, setDays, month])
   const [selectedDay, setSelectedDay] = useState<Day | undefined>()
+  const [open, setOpen] = useState(false)
 
   return (
     <div className="mx-2 flex flex-auto flex-col shadow ring-1 ring-black ring-opacity-5">
@@ -443,7 +444,10 @@ function MonthView({
                 'relative flex w-full cursor-pointer flex-col justify-start text-start disabled:cursor-default',
               )}
               disabled={day.events.length === 0}
-              onClick={() => setSelectedDay(day)}
+              onClick={() => {
+                setSelectedDay(day)
+                setOpen(true)
+              }}
             >
               <time
                 dateTime={day.date}
@@ -483,24 +487,23 @@ function MonthView({
           ))}
         </div>
       </div>
-      <Modal selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
+      <Modal selectedDay={selectedDay} open={open} setOpen={setOpen} />
     </div>
   )
 }
 
 function Modal({
   selectedDay,
-  setSelectedDay,
+
+  open,
+  setOpen,
 }: {
   selectedDay: Day | undefined
-  setSelectedDay: (selectedDay: Day | undefined) => void
+  open: boolean
+  setOpen: (open: boolean) => void
 }) {
   return (
-    <Dialog
-      open={Boolean(selectedDay)}
-      onClose={() => setSelectedDay(undefined)}
-      className="relative z-10"
-    >
+    <Dialog open={open} onClose={setOpen} className="relative z-10">
       <DialogBackdrop
         transition
         className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
@@ -515,7 +518,7 @@ function Modal({
             <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
               <button
                 type="button"
-                onClick={() => setSelectedDay(undefined)}
+                onClick={() => setOpen(false)}
                 className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 <span className="sr-only">Close</span>
