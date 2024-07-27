@@ -360,117 +360,6 @@ function PrayerTimes() {
   )
 }
 
-function MobileView({ days }: { days: any[] }) {
-  return (
-    <div
-      className={clsx(
-        days.length === 42 ? 'lg:grid-rows-6' : 'lg:grid-rows-5',
-        'isolate grid w-full grid-cols-7 gap-px lg:hidden',
-      )}
-    >
-      {days.map((day: any) => (
-        <button
-          key={day.englishDate}
-          type="button"
-          className={clsx(
-            day.isCurrentMonth ? 'bg-white' : 'bg-slate-50',
-            (day.isSelected || day.isToday) && 'font-semibold',
-            day.isSelected && 'text-white',
-            !day.isSelected && day.isToday && 'text-indigo-600',
-            !day.isSelected &&
-              day.isCurrentMonth &&
-              !day.isToday &&
-              'text-slate-900',
-            !day.isSelected &&
-              !day.isCurrentMonth &&
-              !day.isToday &&
-              'text-slate-500',
-            'flex h-14 flex-col px-3 py-2 hover:bg-slate-100 focus:z-10',
-          )}
-        >
-          <time
-            dateTime={day.date}
-            className={clsx(
-              day.isSelected &&
-                'flex h-6 w-6 items-center justify-center rounded-full',
-              day.isSelected && day.isToday && 'bg-indigo-600',
-              day.isSelected && !day.isToday && 'bg-slate-900',
-              'ml-auto',
-            )}
-          >
-            <p>{day.hijriDate.split('-').pop().replace(/^0/, '')}</p>
-            <p>{day.englishDate.split('-').pop().replace(/^0/, '')}</p>
-          </time>
-          <span className="sr-only">{day.events.length} events</span>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-function DesktopView({ days }: { days: any[] }) {
-  return (
-    <div
-      className={clsx(
-        days.length === 42 ? 'lg:grid-rows-6' : 'lg:grid-rows-5',
-        'hidden w-full lg:grid lg:grid-cols-7 lg:gap-px',
-      )}
-    >
-      {days.map((day: any) => (
-        <div
-          key={day.englishDate}
-          className={clsx(
-            day.isCurrentMonth && day.color !== '10' && day.color !== '11'
-              ? 'bg-white'
-              : 'bg-slate-50 text-slate-500',
-            day.color === '10' && 'bg-teal-600 font-semibold text-white',
-            'relative px-3 py-2',
-            day.color === '11' && 'bg-slate-600 font-semibold text-white',
-            'relative px-3 py-2',
-          )}
-        >
-          <time
-            dateTime={day.date}
-            className={clsx(
-              day.isToday
-                ? '-mx-3 -mt-2 bg-indigo-600 px-3 py-2 font-semibold text-white'
-                : undefined,
-              'flex justify-between',
-            )}
-          >
-            <p>{day.englishDate.split('-').pop()}</p>
-            <p>{day.hijriDate.split('-').pop()}</p>
-          </time>
-          {day.events.length > 0 && (
-            <ol className="mt-2">
-              {day.events.slice(0, 2).map((event: any) => (
-                <li key={event.title}>
-                  <a href={event.href} className="group flex">
-                    <p className="flex-auto font-medium leading-4">
-                      {event.title}
-                    </p>
-                    <time
-                      dateTime={event.datetime}
-                      className="ml-3 hidden flex-none xl:block"
-                    >
-                      {event.time}
-                    </time>
-                  </a>
-                </li>
-              ))}
-              {day.events.length > 2 && (
-                <li className="text-slate-500">
-                  + {day.events.length - 2} more
-                </li>
-              )}
-            </ol>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 function MonthView({
   startDate,
   endDate,
@@ -486,7 +375,7 @@ function MonthView({
   }, [startDate, endDate, setDays, month])
 
   return (
-    <div className="mx-2 shadow ring-1 ring-black ring-opacity-5 lg:flex lg:flex-auto lg:flex-col">
+    <div className="mx-2 flex flex-auto flex-col shadow ring-1 ring-black ring-opacity-5">
       <div className="grid grid-cols-7 gap-px border-b border-slate-300 bg-slate-200 text-center text-xs font-semibold leading-6 text-slate-700 lg:flex-none">
         <div className="bg-white py-2">
           S<span className="sr-only sm:not-sr-only">un</span>
@@ -510,9 +399,64 @@ function MonthView({
           S<span className="sr-only sm:not-sr-only">at</span>
         </div>
       </div>
-      <div className="flex bg-slate-200 text-xs leading-6 text-slate-700 lg:flex-auto">
-        <DesktopView days={days} />
-        <MobileView days={days} />
+      <div className="flex flex-auto bg-slate-200 text-xs leading-6 text-slate-700">
+        <div
+          className={clsx(
+            days.length === 42 ? 'grid-rows-6' : 'grid-rows-5',
+            'grid w-full grid-cols-7 gap-px',
+          )}
+        >
+          {days.map((day: any) => (
+            <div
+              key={day.englishDate}
+              className={clsx(
+                day.isCurrentMonth && day.color !== '10' && day.color !== '11'
+                  ? 'bg-white'
+                  : 'bg-slate-50 text-slate-500',
+                day.color === '10' && 'bg-teal-600 font-semibold text-white',
+                'relative px-3 py-2',
+                day.color === '11' && 'bg-slate-600 font-semibold text-white',
+                'relative px-3 py-2',
+              )}
+            >
+              <time
+                dateTime={day.date}
+                className={clsx(
+                  day.isToday &&
+                    '-mx-3 -mt-2 bg-indigo-600 px-3 py-2 font-semibold text-white',
+                  'block text-end sm:flex sm:justify-between',
+                )}
+              >
+                <p>{day.hijriDate.split('-').pop()}</p>
+                <p>{day.englishDate.split('-').pop()}</p>
+              </time>
+              {day.events.length > 0 && (
+                <ol className="mt-2 hidden sm:block">
+                  {day.events.slice(0, 2).map((event: any) => (
+                    <li key={event.title}>
+                      <a href={event.href} className="group flex">
+                        <p className="flex-auto font-medium leading-4">
+                          {event.title}
+                        </p>
+                        <time
+                          dateTime={event.datetime}
+                          className="ml-3 hidden flex-none xl:block"
+                        >
+                          {event.time}
+                        </time>
+                      </a>
+                    </li>
+                  ))}
+                  {day.events.length > 2 && (
+                    <li className="text-slate-500">
+                      + {day.events.length - 2} more
+                    </li>
+                  )}
+                </ol>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -546,7 +490,7 @@ export default function Page() {
     )}`
   }
   return (
-    <div className="col-span-3 w-full tabular-nums lg:flex lg:h-full lg:min-h-screen lg:flex-col">
+    <div className="col-span-3 flex h-full min-h-screen w-full flex-col tabular-nums">
       <header className="grid grid-cols-2 items-center justify-between border-b border-slate-200 px-6 py-4 md:grid-cols-3 lg:flex-none">
         <h1 className="text-base font-semibold normal-nums leading-6 text-slate-900">
           <p>{hijriHeader}</p>
