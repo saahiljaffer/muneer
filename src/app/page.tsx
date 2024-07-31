@@ -335,7 +335,7 @@ const generateCalendarArray = (startDate: any, endDate: any, month: number) => {
   return days
 }
 
-function PrayerTimes() {
+function PrayerTimes({ date }: { date?: string }) {
   const [times, setTimes] = useState({
     imsak: '0:00',
     fajr: '0:00',
@@ -347,40 +347,40 @@ function PrayerTimes() {
   useEffect(() => {
     dayjs.extend(customParseFormat)
 
-    fetch('/api/timings')
+    const url = date ? `/api/timings/${date}` : '/api/timings'
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => setTimes(data))
-  }, [])
+  }, [date])
 
   return (
-    <div className="hidden sm:block">
-      <ul className="flex gap-4 md:gap-8">
-        <li className="text-center">
-          <p className="font-medium">إمساك</p>
-          <p>{times.imsak}</p>
-        </li>
-        <li className="text-center">
-          <p className="font-medium">الفجر</p>
-          <p>{times.fajr}</p>
-        </li>
-        <li className="text-center">
-          <p className="font-medium">الشروق</p>
-          <p>{times.sunrise}</p>
-        </li>
-        <li className="text-center">
-          <p className="font-medium">الظهر</p>
-          <p>{times.dhuhr}</p>
-        </li>
-        <li className="text-center">
-          <p className="font-medium">غروب</p>
-          <p>{times.sunset}</p>
-        </li>
-        <li className="text-center">
-          <p className="font-medium">المغرب</p>
-          <p>{times.maghrib}</p>
-        </li>
-      </ul>
-    </div>
+    <ul className="flex justify-between gap-4 md:gap-8">
+      <li className="text-center">
+        <p className="font-medium">إمساك</p>
+        <p>{times.imsak}</p>
+      </li>
+      <li className="text-center">
+        <p className="font-medium">الفجر</p>
+        <p>{times.fajr}</p>
+      </li>
+      <li className="text-center">
+        <p className="font-medium">الشروق</p>
+        <p>{times.sunrise}</p>
+      </li>
+      <li className="text-center">
+        <p className="font-medium">الظهر</p>
+        <p>{times.dhuhr}</p>
+      </li>
+      <li className="text-center">
+        <p className="font-medium">غروب</p>
+        <p>{times.sunset}</p>
+      </li>
+      <li className="text-center">
+        <p className="font-medium">المغرب</p>
+        <p>{times.maghrib}</p>
+      </li>
+    </ul>
   )
 }
 
@@ -443,7 +443,6 @@ function MonthView({
                 day.color === '11' && 'bg-slate-600 font-semibold text-white',
                 'relative flex w-full cursor-pointer flex-col justify-start text-start disabled:cursor-default',
               )}
-              disabled={day.events.length === 0}
               onClick={() => {
                 setSelectedDay(day)
                 setOpen(true)
@@ -452,15 +451,15 @@ function MonthView({
               <time
                 dateTime={day.date}
                 className={clsx(
-                  day.isToday && 'bg-indigo-600 font-semibold text-white',
-                  'w-full p-2 text-end leading-5 sm:flex sm:justify-between sm:px-3',
+                  day.isToday && 'bg-indigo-600 py-2 font-semibold text-white',
+                  'w-full px-2 pt-2 text-end leading-5 sm:flex sm:justify-between sm:px-3',
                 )}
               >
                 <p>{day.hijriDate.split('-').pop()}</p>
                 <p>{day.englishDate.split('-').pop()}</p>
               </time>
               {day.events.length > 0 && (
-                <ol className="hidden px-3 sm:block">
+                <ol className="hidden px-3 py-2 sm:block">
                   {day.events.slice(0, 2).map((event: any) => (
                     <li key={event.title}>
                       <a href={event.href} className="group flex">
@@ -525,7 +524,7 @@ function Modal({
               </button>
             </div>
             <div className="sm:flex sm:items-start">
-              <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+              <div className="mt-3 w-full text-center sm:mx-4 sm:mt-0 sm:text-left">
                 <DialogTitle
                   as="h3"
                   className="text-base font-semibold leading-6 text-gray-900"
@@ -534,13 +533,14 @@ function Modal({
                     .locale('ar')
                     .format('iD iMMMM iYYYY')}
                 </DialogTitle>
-                <div className="mt-2">
+                <div className="my-2">
                   {selectedDay?.events.map((event) => (
                     <p key={event.title}>
                       <span className="font-semibold">{event.title}</span>
                     </p>
                   ))}
                 </div>
+                <PrayerTimes date={selectedDay?.englishDate} />
               </div>
             </div>
           </DialogPanel>
@@ -584,7 +584,9 @@ export default function Page() {
           <p>{hijriHeader}</p>
           <p>{englishHeader}</p>
         </h1>
-        <PrayerTimes />
+        <div className="hidden sm:block">
+          <PrayerTimes />
+        </div>
         <div className="flex items-center justify-end">
           <div className="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
             <button

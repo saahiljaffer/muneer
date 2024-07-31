@@ -325,6 +325,7 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
   // add format methods
   const oldFormat = proto.format
   proto.format = function (formatStr) {
+    const locale = this.$locale()
     if (!this.isValid()) {
       return oldFormat.bind(this)(formatStr)
     }
@@ -339,9 +340,12 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
     const hijriDate = julianToHijri(jdn)
 
     const result = str.replace(
-      /\[([^\]]+)]|iY{1,4}|iM{1,4}|iD{1,2}|id{1,4}/g,
+      /\[([^\]]+)]|iY{1,4}|iM{1,4}|iDo|iD{1,2}|id{1,4}/g,
       (match) => {
+        console.log(match)
         switch (match) {
+          case 'iDo':
+            return locale.ordinal(hijriDate.hd)
           case 'iYY':
             return String(hijriDate.hy).slice(-2)
           case 'iYYYY':

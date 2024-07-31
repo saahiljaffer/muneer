@@ -7,5 +7,6 @@ declare module 'dayjs' {
   interface Dayjs {
     iYear(): number
     iMonth(): number
+    iDay(): number
   }
 }
