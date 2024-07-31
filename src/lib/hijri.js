@@ -342,7 +342,6 @@ const hijri = (option, dayjsClass, dayjsFactory) => {
     const result = str.replace(
       /\[([^\]]+)]|iY{1,4}|iM{1,4}|iDo|iD{1,2}|id{1,4}/g,
       (match) => {
-        console.log(match)
         switch (match) {
           case 'iDo':
             return locale.ordinal(hijriDate.hd)
