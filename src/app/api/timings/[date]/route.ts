@@ -3,9 +3,7 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { initializeApp } from 'firebase/app'
 import { doc, getDoc, getFirestore } from 'firebase/firestore/lite'
-import type { NextApiRequest, NextApiResponse } from 'next'
-
-var customParseFormat = require('dayjs/plugin/customParseFormat')
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -19,20 +17,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
-dayjs.extend(customParseFormat)
-dayjs.extend(utc)
-dayjs.extend(timezone)
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<any>,
+export async function GET(
+  request: Request,
+  { params }: { params: { date: string } },
 ) {
+  const date = params.date
   dayjs.extend(customParseFormat)
+  dayjs.extend(utc)
+  dayjs.extend(timezone)
 
-  const today = dayjs().tz('America/Toronto')
-  const docRef = doc(db, 'times', today.format('MM-DD'))
+  const day = dayjs(date).tz('America/Toronto')
+  const docRef = doc(db, 'times', day.format('MM-DD'))
   const docSnap = await getDoc(docRef)
   const prayers: { [key: string]: string } = docSnap.data() || {}
-  const isDst = today.utcOffset() === -240 ? 1 : 0
+  const isDst = day.utcOffset() === -240 ? 1 : 0
 
   Object.keys(prayers).forEach((name) => {
     prayers[name] = dayjs(`${dayjs().format('YYYY-MM-DD')} ${prayers[name]}`)
@@ -40,5 +38,5 @@ export default async function handler(
       .format('h:mm')
   })
 
-  res.status(200).json(prayers)
+  return Response.json(prayers)
 }

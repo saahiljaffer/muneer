@@ -494,7 +494,6 @@ function MonthView({
 
 function Modal({
   selectedDay,
-
   open,
   setOpen,
 }: {
