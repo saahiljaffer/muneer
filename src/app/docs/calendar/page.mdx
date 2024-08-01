@@ -1,0 +1,88 @@
+export const metadata = {
+  title: 'Calendar',
+  description:
+    'On this page, we’ll dive into the different calendar endpoints you can use to retrieve dates programmatically.',
+}
+
+# Calendar
+
+---
+
+## Convert a gregorian date to hijri {{ tag: 'GET', label: '/api/gToH/:date' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to convert a gregorian date to hijri (default: today).
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/api/gToH/:date">
+
+    ```bash {{ title: 'cURL' }}
+    curl -G https://alwaqt.app/api/gToH/:date
+    ```
+
+    </CodeGroup>
+
+    ```json {{ title: 'Response' }}
+    {
+      "year": "١٤٤٦",
+      "month": "محرم",
+      "day": "٢٥",
+    }
+    ```
+
+  </Col>
+</Row>
+
+---
+
+## Retrieve an iCal file with all events {{ tag: 'GET', label: '/api/ical' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to retrieve an iCal file with all events for the current and next year.
+    </Col>
+
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/api/ical">
+
+    ```bash {{ title: 'cURL' }}
+    curl -G https://alwaqt.app/api/ical
+    ```
+
+    </CodeGroup>
+
+    ```text {{ title: 'Response' }}
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    PRODID:alwaqt
+    METHOD:PUBLISH
+    X-PUBLISHED-TTL:PT1H
+    BEGIN:VEVENT
+    UID:id_1stmuharram_1446
+    SUMMARY:1st Muharram
+    DTSTAMP:20240725T002234Z
+    DTSTART;VALUE=DATE:20240707
+    DTEND;VALUE=DATE:20240708
+    TRANSP:TRANSPARENT
+    END:VEVENT
+    BEGIN:VEVENT
+    UID:id_ashura_1446
+    SUMMARY:Ashura
+    DTSTAMP:20240725T002234Z
+    DTSTART;VALUE=DATE:20240716
+    DTEND;VALUE=DATE:20240717
+    TRANSP:OPAQUE
+    END:VEVENT
+    ...
+    END:VCALENDAR
+    ```
+
+  </Col>
+</Row>

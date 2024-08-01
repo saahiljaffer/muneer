@@ -1,25 +1,27 @@
 export const metadata = {
-  title: 'Conversations',
+  title: 'Timings',
   description:
-    'On this page, we’ll dive into the different conversation endpoints you can use to manage conversations programmatically.',
+    'On this page, we’ll dive into the different timings endpoints you can use to retrieve prayer timings programmatically.',
 }
 
 # Timings
 
-## List today's timings {{ tag: 'GET', label: '/api/timings' }}
+---
+
+## List prayer timings for a specific date {{ tag: 'GET', label: '/api/timings/:date' }}
 
 <Row>
   <Col>
 
-    This endpoint allows you to retrieve a list of all timings for today.
+    This endpoint allows you to retrieve a list of all timings for a specific date (default: today).
 
   </Col>
   <Col sticky>
 
-    <CodeGroup title="Request" tag="GET" label="/api/timings">
+    <CodeGroup title="Request" tag="GET" label="/api/timings/:date">
 
     ```bash {{ title: 'cURL' }}
-    curl -G https://alwaqt.app/api/timings
+    curl -G https://alwaqt.app/api/timings/:date
     ```
 
     </CodeGroup>

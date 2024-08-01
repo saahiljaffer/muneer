@@ -23,7 +23,7 @@ const nextConfig = {
       permanent: true,
     },
     {
-      source: '/ical',
+      source: '/api/ical',
       destination: '/events.ics',
       permanent: true,
     },
