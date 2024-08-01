@@ -2,35 +2,12 @@ import { forwardRef } from 'react'
 import Link from 'next/link'
 import clsx from 'clsx'
 import { motion, useScroll, useTransform } from 'framer-motion'
-
-import { Button } from '@/components/Button'
-import { Logo } from '@/components/Logo'
 import {
   MobileNavigation,
   useIsInsideMobileNavigation,
 } from '@/components/MobileNavigation'
 import { useMobileNavigationStore } from '@/components/MobileNavigation'
-import { MobileSearch, Search } from '@/components/Search'
-import { ThemeToggle } from '@/components/ThemeToggle'
-
-function TopLevelNavItem({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
-  return (
-    <li>
-      <Link
-        href={href}
-        className="text-sm leading-5 text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-      >
-        {children}
-      </Link>
-    </li>
-  )
-}
+import { Search } from '@/components/Search'
 
 export const Header = forwardRef<
   React.ElementRef<'div'>,
