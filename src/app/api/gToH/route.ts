@@ -10,3 +10,5 @@ export async function GET(request: Request) {
   const today = dayjs().tz('America/Toronto')
   redirect(`/api/gToH/${today.format('YYYY-MM-DD')}`)
 }
+
+export const dynamic = 'force-dynamic'
